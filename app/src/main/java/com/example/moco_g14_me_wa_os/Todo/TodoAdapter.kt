@@ -9,26 +9,60 @@ import android.view.ViewGroup
 import android.view.View
 import android.widget.TextView
 import android.widget.CheckBox
+import android.widget.ImageButton
+import androidx.core.content.ContextCompat
 
 
+class TodoAdapter: ListAdapter<Task, TodoAdapter.TodoViewHolder>(TaskDiffCallback()) {
 
-class TodoAdapter: ListAdapter<Task, TodoAdapter.TaskViewHolder>(TaskDiffCallback()) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.todo_item, parent, false)
-        return TaskViewHolder(view)
+        return TodoViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
         val task = getItem(position)
         holder.bind(task)
     }
 
-    class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class TodoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(task: Task) {
-            itemView.findViewById<TextView>(R.id.todo_task_name).text = task.name
-            itemView.findViewById<CheckBox>(R.id.todo_task_completed).isChecked = task.completed
+            val taskNameTextView = itemView.findViewById<TextView>(R.id.todo_name)
+            val completeButton = itemView.findViewById<ImageButton>(R.id.completeButton)
+
+            completeButton.setImageResource(if (task.completed) R.drawable.checked_24 else R.drawable.unchecked_24)
+            completeButton.setColorFilter(
+                ContextCompat.getColor(
+                    itemView.context,
+                    if (task.completed) R.color.green else R.color.black
+                )
+            )
+            taskNameTextView.setTextColor(
+                ContextCompat.getColor(
+                    itemView.context,
+                    if (task.completed) R.color.green else R.color.black
+                )
+            )
+
+            //set click listener
+            completeButton.setOnClickListener {
+                task.completed = !task.completed
+
+                completeButton.setImageResource(if (task.completed) R.drawable.checked_24 else R.drawable.unchecked_24)
+                completeButton.setColorFilter(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        if (task.completed) R.color.green else R.color.black
+                    )
+                )
+                taskNameTextView.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        if (task.completed) R.color.green else R.color.black
+                    )
+                )
+            }
         }
     }
 
@@ -36,7 +70,6 @@ class TodoAdapter: ListAdapter<Task, TodoAdapter.TaskViewHolder>(TaskDiffCallbac
         override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
             return oldItem.taskID == newItem.taskID
         }
-
         override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
             return oldItem == newItem
         }

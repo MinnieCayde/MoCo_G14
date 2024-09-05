@@ -1,20 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<androidx.cardview.widget.CardView
+    android:id="@+id/taskCellContainer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:layout_height="90dp"
+    app:cardCornerRadius="5dp"
+    android:layout_margin="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <CheckBox
-        android:id="@+id/todo_task_completed"
-        android:layout_width="48dp"
-        android:layout_height="48dp" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/todo_task_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="Task Name"
-        android:paddingStart="16dp" />
-</LinearLayout>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleY="1.5"
+            android:scaleX="1.5"
+            android:contentDescription="@string/checkbox"
+            android:id="@+id/completeButton"
+            android:layout_marginHorizontal="15dp"
+            android:src="@drawable/unchecked_24"
+            android:backgroundTint="@android:color/transparent"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/todo_name"
+            android:text="@string/placeholder"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            />
+
+        <TextView
+            android:layout_marginHorizontal="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dueTime"
+            android:text="@string/placeholder"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_gravity="center"
+            />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

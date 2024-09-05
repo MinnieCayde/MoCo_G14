@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Moco_G14_Me_Wa_Os" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Moco_G14_Me_Wa_Os" parent="Theme.AppCompat.Light.DarkActionBar" />
+    <item name="colorPrimary" type="color">@color/purple_500</item> <!-- Adjust colors as per your project -->
+    <item name="colorPrimaryDark" type="color">@color/purple_700</item>
+    <item name="colorAccent" type="color">@color/teal_200</item>
+    <item name="statusBarColor" type="color">@color/purple_700</item>
+
+    <!-- Material Components Theme -->
+    <style name="Theme.MaterialTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+    </style>
+
 </resources>

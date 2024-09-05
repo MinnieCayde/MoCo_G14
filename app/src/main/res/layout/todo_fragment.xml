@@ -1,24 +1,31 @@
-<!-- res/layout/fragment_todo.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/todo_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <EditText
-        android:id="@+id/todo_task_input"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:hint="Enter Task Name" />
+        android:id="@+id/todoListRecyclerView"
+        android:backgroundTint="@color/design_default_color_background"
+        />
 
-    <Button
-        android:id="@+id/todo_add_button"
+    <androidx.appcompat.widget.AppCompatImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Task" />
-</LinearLayout>
+        android:src="@drawable/ic_launcher_foreground"
+        android:text="New Task"
+        android:id="@+id/newTaskButton"
+        android:background="@drawable/circular_button_backgr"
+        android:textColor="?colorOnPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:padding="5dp"
+        android:layout_margin="50dp"
+        />
+
+</RelativeLayout>

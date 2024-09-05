@@ -7,5 +7,6 @@ import java.util.UUID
 @Entity(tableName = "tasks")
 data class Task (
     val name: String,
-    val completed: Boolean = false,
+    val description: String,
+    var completed: Boolean = false,
     @PrimaryKey val taskID: UUID = UUID.randomUUID())
