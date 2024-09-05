@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.Moco_G14_Me_Wa_Os" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="nightModeSwitch" parent="Theme.Moco_G14_Me_Wa_Os">
+        <item name="android:colorControlActivated">@color/DarkModePurple</item>
+        <item name="android:colorButtonNormal">@color/white</item>
+        <item name="android:colorForeground">@color/white</item>
+    </style>
 </resources>
