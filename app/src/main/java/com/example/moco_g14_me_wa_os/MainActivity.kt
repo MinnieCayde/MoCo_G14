@@ -21,18 +21,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_layout)
 
-
-
-        // Referenzen zu den ToggleButtons (3 ersten sind für Session Selection)
+        // Referenzen zu den ToggleButtons
         val toggleOption1 = findViewById<ToggleButton>(R.id.toggleOption1)
         val toggleOption2 = findViewById<ToggleButton>(R.id.toggleOption2)
         val toggleOption3 = findViewById<ToggleButton>(R.id.toggleOption3)
-        val worktimeOption1 = findViewById<ToggleButton>(R.id.workTimeOption1)
-        val worktimeOption2 = findViewById<ToggleButton>(R.id.workTimeOption2)
-        val shortBreakTimeOption1 = findViewById<ToggleButton>(R.id.shortBreakTimeOption1)
-        val shortBreakTimeOption2 = findViewById<ToggleButton>(R.id.shortBreakTimeOption2)
-        val longBreakTimeOption1 = findViewById<ToggleButton>(R.id.longBreakTimeOption1)
-        val longBreakTimeOption2 = findViewById<ToggleButton>(R.id.longBreakTimeOption2)
 
         // Alle ToggleButtons in eine Liste aufnehmen
         val toggleButtons = listOf(toggleOption1, toggleOption2, toggleOption3)
@@ -43,36 +35,44 @@ class MainActivity : ComponentActivity() {
                 if (isChecked) {
                     // Nur dieser ToggleButton wird aktiv - alle anderen deaktivieren
                     deactivateOthers(toggleButtons, buttonView.id)
+
+                    // Aktives Drawable setzen
                     buttonView.setBackgroundResource(R.drawable.active_rounded_time_selectors)
+
+                    // Schriftfarbe ändern (optional)
                     buttonView.setTextColor(resources.getColor(R.color.white))
                 } else {
+                    // Inaktives Drawable setzen
                     buttonView.setBackgroundResource(R.drawable.inactive_rounded_time_selectors)
                 }
             }
         }
     }
 
-    private fun deactivateOthers(toggleButtons: List<ToggleButton>, activeid: Int) {
+    // Methode um alle anderen ToggleButtons zu deaktivieren
+    private fun deactivateOthers(toggleButtons: List<ToggleButton>, activeId: Int) {
         for (toggle in toggleButtons) {
-            if (toggle.id != activeid) {
+            if (toggle.id != activeId) {
                 toggle.isChecked = false
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Moco_G14_Me_Wa_OsTheme {
-        Greeting("Android")
+    @Composable
+    fun Greeting(name: String, modifier: Modifier = Modifier) {
+        Text(
+            text = "Hello $name!",
+            modifier = modifier
+        )
     }
-}
+
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+        Moco_G14_Me_Wa_OsTheme {
+            Greeting("Android")
+        }
+    }
+
+
