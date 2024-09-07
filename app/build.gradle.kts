@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt") // Ensure this line is using Kotlin DSL syntax
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
+
 }
 
 android {
@@ -59,6 +62,18 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.dagger.hilt.android)
+    kapt(libs.dagger.hilt.compiler)
+
+    implementation(libs.hilt.lifecycle.viewmodel)
+    kapt(libs.hilt.compiler)
+
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.material3)
 
     // Room components
     implementation(libs.androidx.room.runtime)
@@ -66,6 +81,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
+    implementation(libs.androidx.benchmark.macro)
     kapt(libs.androidx.room.compiler)
 
     // Test helpers for Room

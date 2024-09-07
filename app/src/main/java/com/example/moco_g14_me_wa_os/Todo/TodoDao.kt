@@ -2,11 +2,12 @@ package com.example.moco_g14_me_wa_os.Todo
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoDao {
     @Query("SELECT * FROM tasks")
-    fun getAllTasks(): LiveData<List<Task>>
+    fun getAllTasks(): Flow<List<Task>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: Task)
