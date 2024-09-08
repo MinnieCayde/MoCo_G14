@@ -21,8 +21,8 @@ compose = "1.5.1"
 compose-compiler = "1.5.3"
 lifecycle = "2.6.2"
 material3 = "1.1.0"
-daggerHilt = "2.44"
-hiltLifecycle = "1.0.0-alpha03"
+hilt = "2.48"
+hiltCompiler = "1.1.0"
 
 
 [libraries]
@@ -51,14 +51,14 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro", version.ref = "benchmarkMacro" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "compose" }
-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHilt"}
-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "daggerHilt" }
-hilt-lifecycle-viewmodel = { group = "androidx.hilt", name = "hilt-lifecycle-viewmodel", version.ref = "hiltLifecycle" }
-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltLifecycle" }
+androidx-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+androidx-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltCompiler" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltCompiler" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

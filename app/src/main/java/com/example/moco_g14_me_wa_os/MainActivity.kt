@@ -6,7 +6,10 @@ import com.example.moco_g14_me_wa_os.ui.theme.Moco_G14_Me_Wa_OsTheme
 import com.example.moco_g14_me_wa_os.Todo.TodoViewModel
 import com.example.moco_g14_me_wa_os.Todo.TodoApp
 import androidx.activity.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     // ViewModel setup for Todo
     private val todoViewModel: TodoViewModel by viewModels()

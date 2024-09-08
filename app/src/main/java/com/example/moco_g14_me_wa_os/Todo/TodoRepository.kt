@@ -2,9 +2,10 @@ package com.example.moco_g14_me_wa_os.Todo
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 
-class TodoRepository(private val todoDao: TodoDao) {
+class TodoRepository @Inject constructor(private val todoDao: TodoDao) {
 
     val allTasks: Flow<List<Task>> = todoDao.getAllTasks()
 

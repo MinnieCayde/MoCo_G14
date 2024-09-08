@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt") // Ensure this line is using Kotlin DSL syntax
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.kotlin.serialization)
 
 }
@@ -62,11 +62,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.dagger.hilt.android)
-    kapt(libs.dagger.hilt.compiler)
-
-    implementation(libs.hilt.lifecycle.viewmodel)
-    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.android)
+    kapt(libs.androidx.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    kapt(libs.androidx.hilt.compiler)
 
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -94,4 +93,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
 }
+
