@@ -24,7 +24,8 @@ data class NavItem(
     val unselectedOption: ImageVector
 )
 
-@Composable @Preview
+@Preview
+@Composable
 fun NavigationBar(state : Int, navController: NavController) {
     val screens = (SettingScreen())
     val navOptions = listOf(
