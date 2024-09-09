@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
+
 class TodoActivity: ComponentActivity() {
     // Get the ViewModel instance using viewModels delegate
     private val todoViewModel: TodoViewModel by viewModels {
@@ -19,12 +19,8 @@ class TodoActivity: ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             // Pass the ViewModel to the Composable
-            TodoApp(todoViewModel)
+            //TodoApp(todoViewModel)
         }
     }
 }
 
-@Composable
-fun TodoApp(todoViewModel: TodoViewModel = viewModel()) {
-    TodoScreen(todoViewModel = todoViewModel)
-}

@@ -50,10 +50,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 
 
 @Composable
-fun TodoScreen(todoViewModel: TodoViewModel) {
+fun TodoScreen(navController: NavController, todoViewModel: TodoViewModel) {
+
+    val todoViewModel: TodoViewModel = hiltViewModel()
+
     val tasks by todoViewModel.allTasks.collectAsState()
 
     // state to control visibility of the new task form
@@ -143,7 +148,7 @@ fun TaskCard(
 
     if (completed) {
         LaunchedEffect(key1 = task) {
-            kotlinx.coroutines.delay(15000) // Delay for 15 seconds
+            kotlinx.coroutines.delay(1200) // Delay for 15 seconds
             onTaskRemove(task)
         }
     }
