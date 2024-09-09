@@ -1,6 +1,7 @@
 package com.example.moco_g14_me_wa_os.Todo
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -32,47 +34,96 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Card
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 
 @Composable
 fun TodoScreen(todoViewModel: TodoViewModel) {
     val tasks by todoViewModel.allTasks.collectAsState()
 
+    // state to control visibility of the new task form
+    var showNewTaskDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Handle new task click */ }) {
+            FloatingActionButton(onClick = {
+                // Show the NewTaskForm dialog
+                showNewTaskDialog = true
+            }) {
                 Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "New Task")
             }
+        },
+        content = { paddingValues ->
+            // Apply padding to the content
+            Column(modifier = Modifier.padding(paddingValues)) {
+                TaskList(
+                    tasks = tasks,
+                    onTaskClick = { task ->
+                        todoViewModel.update(task.copy(completed = !task.completed))
+                    },
+                    onTaskRemove = { task ->
+                        todoViewModel.delete(task)
+                    }
+                )
+            }
+
+            // Show when the state is true
+            if (showNewTaskDialog) {
+                Dialog(
+                    onDismissRequest = {
+                        // Hide the dialog when clicking outside or dismissing it
+                        showNewTaskDialog = false
+                    },
+                    properties = DialogProperties(
+                        dismissOnClickOutside = true
+                    )
+                ) {
+
+                    Card(
+                        shape = MaterialTheme.shapes.medium,  // Rounded edges
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        NewTaskForm(onSaveClick = { name, description ->
+                            // Handle task creation logic
+                            todoViewModel.insert(Task(name = name, description = description, completed = false))
+                            showNewTaskDialog = false
+                        })
+                    }
+                }
+            }
         }
-    ) { paddingValues ->
-        // Apply padding to the TaskList content using the paddingValues from Scaffold
-        TaskList(
-            tasks = tasks,
-            onTaskClick = { task ->
-                todoViewModel.update(task.copy(completed = !task.completed))
-            },
-            modifier = Modifier.padding(paddingValues)  // Apply the padding here
-        )
-    }
+    )
 }
 
 @Composable
-fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, modifier: Modifier = Modifier) {
+fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task) -> Unit, modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier.fillMaxSize() // Apply modifier to LazyColumn
     ) {
         items(tasks) { task ->
             TaskCard(
+                task = task,
                 taskName = task.name,
                 description = task.description,
                 completed = task.completed,
-                onTaskClick = { onTaskClick(task) }
+                onTaskClick = { onTaskClick(task)},
+                onTaskRemove = { onTaskRemove(task) }
             )
         }
     }
@@ -80,17 +131,36 @@ fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, modifier: Modifier 
 
 @Composable
 fun TaskCard(
+    task: Task,
     taskName: String,
     description: String,
     completed: Boolean,
-    onTaskClick: () -> Unit
+    onTaskClick: () -> Unit,
+    onTaskRemove: (Task) -> Unit
 ) {
+    // Track whether the task is clicked or not
+    var isClicked by remember { mutableStateOf(false) }
+
+    if (completed) {
+        LaunchedEffect(key1 = task) {
+            kotlinx.coroutines.delay(15000) // Delay for 15 seconds
+            onTaskRemove(task)
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(90.dp)
-            .padding(5.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .padding(5.dp)
+            .clickable {
+                isClicked = !isClicked
+                onTaskClick()  // Trigger the task click callback
+            },
+        elevation = if (isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(8.dp),
+            colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary //.copy(alpha = 0.1f) else MaterialTheme.colorScheme.background
+        )
     ) {
         Row(
             modifier = Modifier
@@ -99,14 +169,34 @@ fun TaskCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onTaskClick) {
+            // Change the button color when clicked
+            IconButton(
+                onClick = {
+                    isClicked = !isClicked
+                    onTaskClick()
+                },
+                modifier = Modifier.size(48.dp)  // Adjust button size
+            ) {
                 Image(
                     painter = painterResource(id = if (completed) R.drawable.checked_24 else R.drawable.unchecked_24),
-                    contentDescription = "Complete"
+                    contentDescription = "Complete",
+                    colorFilter = ColorFilter.tint(if (isClicked) Color.Cyan else Color.Black)
                 )
             }
-            Text(text = taskName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-            Text(text = description, style = MaterialTheme.typography.bodyMedium)
+
+            // Change text color when clicked
+            Text(
+                text = taskName,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
+
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }
@@ -169,6 +259,7 @@ fun TodoScreenPreview() {
         TaskList(
             tasks = tasks,
             onTaskClick = { /* No action for preview */ },
+            onTaskRemove = { /* No action for preview */ },
             modifier = Modifier.padding(paddingValues)
         )
     }
@@ -178,10 +269,12 @@ fun TodoScreenPreview() {
 @Composable
 fun TaskCardPreview() {
     TaskCard(
+        task = Task(name = "Mock Task", description = "This is a preview of a task card", completed = false),
         taskName = "Mock Task",
         description = "This is a preview of a task card",
         completed = false,
-        onTaskClick = { /* No action for preview */ }
+        onTaskClick = { /* No action for preview */ },
+        onTaskRemove = { /* No action for preview */ }
     )
 }
 
@@ -206,6 +299,7 @@ fun TaskListPreview() {
     // Display the TaskList with the static tasks
     TaskList(
         tasks = tasks,
-        onTaskClick = { /* No action for preview */ }
+        onTaskClick = { /* No action for preview */ },
+        onTaskRemove = { /* No action for preview */ }
     )
 }

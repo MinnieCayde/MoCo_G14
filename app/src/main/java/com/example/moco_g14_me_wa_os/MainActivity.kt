@@ -9,9 +9,9 @@ import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 
 
-@AndroidEntryPoint
+
 class MainActivity : ComponentActivity() {
-    // ViewModel setup for Todo
+
     private val todoViewModel: TodoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.hilt.android)
+    implementation(libs.androidx.material3.android)
     kapt(libs.androidx.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.androidx.hilt.compiler)
@@ -73,6 +74,18 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.material3)
+    // Compose UI
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+
+    // Compose Material
+    implementation(libs.androidx.compose.material3)
+
+    // Foundation (for clickable, size, etc.)
+    implementation(libs.androidx.compose.foundation)
+
+    // Optional: Preview functionality
+    implementation(libs.androidx.ui.tooling.preview)
 
     // Room components
     implementation(libs.androidx.room.runtime)
