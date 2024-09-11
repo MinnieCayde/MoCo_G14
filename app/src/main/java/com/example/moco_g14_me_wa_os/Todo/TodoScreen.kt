@@ -132,12 +132,12 @@ fun TaskCard(
     onTaskClick: () -> Unit,
     onTaskRemove: (Task) -> Unit
 ) {
-    // Track whether the task is clicked or not
+    // Track task is clicked or not
     var isClicked by remember { mutableStateOf(false) }
 
     if (completed) {
         LaunchedEffect(key1 = task) {
-            kotlinx.coroutines.delay(1200) // Delay for 15 seconds
+            kotlinx.coroutines.delay(1200) // Delay
             onTaskRemove(task)
         }
     }
@@ -149,11 +149,11 @@ fun TaskCard(
             .padding(5.dp)
             .clickable {
                 isClicked = !isClicked
-                onTaskClick()  // Trigger the task click callback
+                onTaskClick()
             },
         elevation = if (isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(8.dp),
             colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary //.copy(alpha = 0.1f) else MaterialTheme.colorScheme.background
+            containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
         Row(
@@ -236,13 +236,13 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun TodoScreenPreview() {
-    // Sample static data for preview purposes
+
     val tasks = listOf(
         Task(name = "Mock Task 1", description = "This is a mock task", completed = false),
         Task(name = "Mock Task 2", description = "Another mock task", completed = true)
     )
 
-    // Directly pass the sample tasks to the TaskList composable
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { /* No action for preview */ }) {
@@ -283,14 +283,13 @@ fun NewTaskFormPreview() {
 @Preview(showBackground = true)
 @Composable
 fun TaskListPreview() {
-    // Sample static tasks for preview purposes
+
     val tasks = listOf(
         Task(name = "Mock Task 1", description = "This is the first task", completed = false),
         Task(name = "Mock Task 2", description = "This is the second task", completed = true),
         Task(name = "Mock Task 3", description = "This is the third task", completed = false)
     )
 
-    // Display the TaskList with the static tasks
     TaskList(
         tasks = tasks,
         onTaskClick = { /* No action for preview */ },

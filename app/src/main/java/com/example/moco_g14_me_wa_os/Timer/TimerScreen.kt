@@ -13,12 +13,11 @@ import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TimerScreen(
-    modifier: Modifier = Modifier,
-    viewModel: PomodoroTimerViewModel = viewModel()
-) {
-    val timerValue by viewModel.timerValue.collectAsState()
-    val isRunning by viewModel.isRunning.collectAsState()
+fun TimerScreen(timerViewModel: PomodoroTimerViewModel = viewModel()) {
+
+    val modifier: Modifier = Modifier
+    val timerValue by timerViewModel.timerValue.collectAsState()
+    val isRunning by timerViewModel.isRunning.collectAsState()
     val totalTime = 25 * 60 * 1000L // 25 minutes in milliseconds wichtig für progressbar
     val progress = 1f - (timerValue.toFloat() / totalTime)
 
@@ -43,7 +42,7 @@ fun TimerScreen(
             Slider(
                 value = timerValue.toFloat(),
                 onValueChange = { newValue ->
-                    viewModel.changeTime(newValue.toInt())
+                    timerViewModel.changeTime(newValue.toInt())
                 },
                 valueRange = 5f..60f, // Slider-Bereich von 5 bis 60 Minuten
                 steps = 11, // Anzahl der Schritte zwischen 5 und 60 Minuten
@@ -65,19 +64,19 @@ fun TimerScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = { viewModel.startTimer() },
+                    onClick = { timerViewModel.startTimer() },
                     enabled = !isRunning
                 ) {
                     Text("Start")
                 }
                 Button(
-                    onClick = { viewModel.pauseTimer() },
+                    onClick = { timerViewModel.pauseTimer() },
                     enabled = isRunning
                 ) {
                     Text("Pause")
                 }
                 Button(
-                    onClick = { viewModel.resetTimer() },
+                    onClick = { timerViewModel.resetTimer() },
                     enabled = !isRunning
                 ) {
                     Text("Reset")

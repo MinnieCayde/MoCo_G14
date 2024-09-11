@@ -1,6 +1,8 @@
 package com.example.moco_g14_me_wa_os
 
 
+import TimerScreen
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerService
+import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -32,15 +38,6 @@ fun MainNavigation() {
     val navController = rememberNavController()
     val pagerState = rememberPagerState(1) { 3 }
     val coroutineScope = rememberCoroutineScope()
-
-
-//    LaunchedEffect(pagerState.currentPage) {
-//        when(pagerState.currentPage) {
-//            0 -> navController.navigate("todo")
-//            1 -> navController.navigate("timer")
-//            2 -> navController.navigate("settings")
-//        }
-//    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -74,16 +71,6 @@ fun MainNavigation() {
             }
         }
     }
-
-//    LaunchedEffect(navController) {
-//        navController.currentBackStackEntryFlow.collect { backStackEntry ->
-//            when (backStackEntry.destination.route) {
-//                "todo" -> pagerState.animateScrollToPage(0)
-//                "timer" -> pagerState.animateScrollToPage(1)
-//                "settings" -> pagerState.animateScrollToPage(2)
-//            }
-//        }
-//    }
 }
 
 
@@ -97,8 +84,16 @@ fun LeftScreen(navController: NavController){
 
 @Composable
 fun MiddleScreen(navController: NavController) {
-    // Content for the left screen
-    Text(text = "Left Screen")
+    val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
+    val context = LocalContext.current
+    TimerScreen(timerViewModel = timerViewModel)
+    LaunchedEffect(Unit) {
+        startTimerService(context)
+    }
+}
+private fun startTimerService(context: android.content.Context){
+    val intent = Intent(context, PomodoroTimerService::class.java)
+    ContextCompat.startForegroundService(context, intent)
 }
 
 

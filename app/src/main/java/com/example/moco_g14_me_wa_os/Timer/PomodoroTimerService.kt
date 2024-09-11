@@ -28,6 +28,13 @@ class PomodoroTimerService : Service() {
         return binder
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val notification = createNotification("")
+        startForeground(NOTIFICATION_ID, notification)
+
+        return START_STICKY
+    }
+
     fun setCallback(cb: (Long) -> Unit) {
         callback = cb
     }
@@ -44,6 +51,7 @@ class PomodoroTimerService : Service() {
                 override fun onFinish() {
                     isTimerRunning = false
                     updateNotification("Pomodoro finished!")
+                    stopSelf() //stop service once timer finished
                 }
             }.start()
 
@@ -61,7 +69,9 @@ class PomodoroTimerService : Service() {
     }
 
     fun resetTimer() {
-        timer.cancel()
+        if (::timer.isInitialized) {
+            timer.cancel()
+        }
         timeLeftInMillis = 25 * 60 * 1000L
         isTimerRunning = false
         callback?.invoke(timeLeftInMillis)
