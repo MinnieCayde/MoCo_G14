@@ -37,25 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Column
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Card
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 
 
 @Composable
-fun TodoScreen(navController: NavController, todoViewModel: TodoViewModel) {
+fun TododScreen(todoViewModel: TodoViewModel) {
 
     val todoViewModel: TodoViewModel = hiltViewModel()
 
