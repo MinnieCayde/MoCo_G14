@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel (private val repository: SettingsRepository): ViewModel() {
+class SettingsViewModel @Inject constructor(private val repository: SettingsRepository): ViewModel() {
     //Flow für Dark Mode
     private val _isDarkMode = MutableStateFlow(false)
     val isDarkMode: StateFlow<Boolean> = _isDarkMode

@@ -9,11 +9,12 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import androidx.datastore.preferences.core.edit
+import javax.inject.Inject
 
 
 val Context.datastore by preferencesDataStore(name = "Settings")
 
-class SettingsRepository (private val context: Context) {
+class SettingsRepository @Inject constructor(private val context: Context) {
     //Keys für den Datastore
     private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
     private val NOTIFICATION_KEY = booleanPreferencesKey("notifications")
