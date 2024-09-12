@@ -1,8 +1,10 @@
 package com.example.moco_g14_me_wa_os.Todo
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import com.example.moco_g14_me_wa_os.R
@@ -31,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,7 +64,7 @@ fun TododScreen(todoViewModel: TodoViewModel) {
                 // Show the NewTaskForm dialog
                 showNewTaskDialog = true
             }) {
-                Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "New Task")
+                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task")
             }
         },
         content = { paddingValues ->
@@ -200,6 +205,7 @@ fun TaskCard(
 fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var selectedPriority by remember { mutableIntStateOf(1) }
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -224,6 +230,17 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Text(
+            text = "Priority: $selectedPriority",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+
+       NumberPickerDialog(initialNumber = selectedPriority, onNumberSelected = { priority -> selectedPriority = priority })
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = { onSaveClick(name, description) },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
@@ -233,6 +250,117 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
     }
 }
 
+@Composable
+fun NumberWheelPicker(items: List<Int>, initialIndex: Int, onItemSelected: (Int) -> Unit) {
+    val selectedItemIndex = remember { mutableIntStateOf(initialIndex) }
+
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        items(items.size) { index ->
+            val item = items[index]
+            Text(
+                text = item.toString(),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = if (index == selectedItemIndex.intValue) Color.Black else Color.Gray
+                ),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable {
+                        selectedItemIndex.intValue = index
+                        onItemSelected(item)
+                    }
+            )
+        }
+    }
+}
+
+@Composable
+fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
+    var isDialogOpen by remember { mutableStateOf(false) }
+    var selectedNumber by remember { mutableStateOf(initialNumber) }
+    var scrollState = rememberLazyListState()
+
+    // Button to open the number picker
+    Button(
+        onClick = { isDialogOpen = true },
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text("Priority: $selectedNumber")
+    }
+
+    if (isDialogOpen) {
+        // Show a Dialog with a LazyColumn inside it
+        Dialog(onDismissRequest = {
+            isDialogOpen = false
+            val middleIndex = scrollState.firstVisibleItemIndex + 2
+            selectedNumber = middleIndex + 1
+            onNumberSelected(selectedNumber)
+        }) {
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(8.dp)
+            ) {
+                // "selector" in Dialog
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Display numbers
+                    items(10) { index ->
+                        val number = index + 1
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .padding(vertical = 8.dp)
+                                .clickable {
+                                    selectedNumber = number
+                                    onNumberSelected(number)
+                                    isDialogOpen = false
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = number.toString(),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = if (number == selectedNumber) Color.Black else Color.Gray
+                            )
+                        }
+                    }
+                }
+                // box for selecting, top and bottom Lines
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .height(1.dp)
+                            .fillMaxWidth(0.8f)
+                            .background(Color.Gray)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .height(1.dp)
+                            .fillMaxWidth(0.8f)
+                            .background(Color.Gray)
+                    )
+                }
+            }
+        }
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun TodoScreenPreview() {
@@ -246,7 +374,7 @@ fun TodoScreenPreview() {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { /* No action for preview */ }) {
-                Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "New Task")
+                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task")
             }
         }
     ) { paddingValues ->
