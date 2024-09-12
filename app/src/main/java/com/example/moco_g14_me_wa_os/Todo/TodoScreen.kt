@@ -251,34 +251,6 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
 }
 
 @Composable
-fun NumberWheelPicker(items: List<Int>, initialIndex: Int, onItemSelected: (Int) -> Unit) {
-    val selectedItemIndex = remember { mutableIntStateOf(initialIndex) }
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        items(items.size) { index ->
-            val item = items[index]
-            Text(
-                text = item.toString(),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = if (index == selectedItemIndex.intValue) Color.Black else Color.Gray
-                ),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        selectedItemIndex.intValue = index
-                        onItemSelected(item)
-                    }
-            )
-        }
-    }
-}
-
-@Composable
 fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     var isDialogOpen by remember { mutableStateOf(false) }
     var selectedNumber by remember { mutableStateOf(initialNumber) }
