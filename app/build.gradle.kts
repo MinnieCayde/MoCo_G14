@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt") // Ensure this line is using Kotlin DSL syntax
+    alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.kotlin.serialization)
+
 }
 
 android {
@@ -44,7 +48,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
     }
 }
@@ -59,11 +63,47 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.hilt.android)
+    implementation(libs.androidx.material3.android)
+    kapt(libs.androidx.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    kapt(libs.androidx.hilt.compiler)
+
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.material3)
+    // Compose UI
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+
+    // Compose Material
+    implementation(libs.androidx.compose.material3)
+
+    // Foundation (for clickable, size, etc.)
+    implementation(libs.androidx.compose.foundation)
+
+    // Optional: Preview functionality
+    implementation(libs.androidx.ui.tooling.preview)
+
+    // Room components
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.preference)
+    implementation(libs.androidx.recyclerview)
     implementation(libs.material)
-    implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.benchmark.macro)
+    kapt(libs.androidx.room.compiler)
+
+    // Test helpers for Room
+    testImplementation(libs.androidx.room.testing)
+
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
