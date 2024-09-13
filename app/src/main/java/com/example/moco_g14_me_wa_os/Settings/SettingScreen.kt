@@ -1,5 +1,6 @@
 package com.example.moco_g14_me_wa_os.Settings
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -24,8 +25,13 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
     val selectedWorkBreakOption by viewModel.selectedWorkBreak.collectAsState()
     val selectedSessionBreakOption by viewModel.selectedSessionBreak.collectAsState()
+    val sessionCount by viewModel.sessionCountValue.collectAsState()
+
+
     val colors = MaterialTheme.colorScheme
 
+    var textValue by remember { mutableStateOf(sessionCount.toString()) }
+    var errorState by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.padding(8.dp).padding(top = 24.dp).fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -62,7 +68,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
                 color = colors.onPrimary)
             Switch(
                 checked = notificationsEnabled,
-                onCheckedChange = {viewModel.toggleDarkmode(it) }
+                onCheckedChange = {viewModel.toggleNotifications(it) }
             )
         }
 
@@ -112,20 +118,54 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
                 )
             }
         }
-    }
+        // Eingabefeld Sessions
+        Text(text = "Sessionanzahl:",
+            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp)
+        )
+        TextField(
+            value = textValue,
+            onValueChange = { newValue ->
+                textValue = newValue // Lokalen Zustand updaten
 
+                val newCount = newValue.toIntOrNull()
+
+                // Wenn der neue Wert eine gültige Zahl ist, wird der Fehlerzustand entfernt
+                if (newCount != null && newCount >= 0) {
+                    errorState = false
+                    viewModel.setSessionCount(newCount)  // Gültige Zahl wird im ViewModel gesetzt
+                } else if (newValue.isEmpty()) {
+                    // Wenn das Textfeld leer ist, setzen wir keinen neuen Wert, sondern erlauben die leere Eingabe
+                    errorState = false
+                } else {
+                    // Ungültige Eingabe wird als Fehler betrachtet
+                    errorState = true
+                }
+            },
+            label = { Text("Input") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = errorState // Textfeld wird rot markiert, wenn der Fehlerzustand aktiv ist
+        )
+        // Optionaler Fehlertext
+        if (errorState) {
+            Text(
+                text = "Bitte eine gültige Zahl eingeben",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
 }
 
 // Vorschau der SettingsScreen mit Mock-Daten
 @Preview(showBackground = true)
 @Composable
-fun SettingsScreenPreview() {
+fun SettingsScreenPreview(viewModel: SettingsViewModel = hiltViewModel()) {
     // Mock-Implementierung, um die Vorschau zu ermöglichen
     val isDarkMode = remember { mutableStateOf(false) }
     val notificationsEnabled = remember { mutableStateOf(true) }
     val selectedWorkTimerOption = remember { mutableStateOf(25) }
     val colors = MaterialTheme.colorScheme
-    val textFieldValue = remember { mutableStateOf("1") } // Eingabefeld initialisiert mit "1"
+    val sessionCount by viewModel.sessionCountValue.collectAsState()
 
     Column(modifier = Modifier.padding(8.dp)) {
         Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -142,7 +182,7 @@ fun SettingsScreenPreview() {
             Text("Dark Mode")
             Switch(
                 checked = isDarkMode.value,
-                onCheckedChange = { isDarkMode.value = it }
+                onCheckedChange = { viewModel.toggleDarkmode(it)}
             )
         }
 
@@ -156,7 +196,7 @@ fun SettingsScreenPreview() {
             Text("Enable Notifications")
             Switch(
                 checked = notificationsEnabled.value,
-                onCheckedChange = { notificationsEnabled.value = it }
+                onCheckedChange = { viewModel.toggleNotifications(it)}
             )
         }
 
@@ -205,11 +245,18 @@ fun SettingsScreenPreview() {
 
         // Eingabefeld hinzufügen
         Text(text = "Sessionanzahl:",
-            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp)
+            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
+            color = colors.onPrimary
         )
         TextField(
-            value = textFieldValue.value,
-            onValueChange = { textFieldValue.value = it },
+            value = sessionCount.toString(),
+            onValueChange = { newValue ->
+                val newCount = newValue.toIntOrNull()
+
+                if (newCount != null && newCount != sessionCount){
+                    viewModel.setSessionCount(newCount)
+                }
+            },
             label = { Text("Input") },
             modifier = Modifier.fillMaxWidth()
         )
