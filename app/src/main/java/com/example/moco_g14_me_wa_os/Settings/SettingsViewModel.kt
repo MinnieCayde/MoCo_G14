@@ -22,8 +22,16 @@ class SettingsViewModel @Inject constructor(private val repository: SettingsRepo
     val notificationsEnabled: StateFlow<Boolean> = _notificationsEnabled
 
     //Flow für Worktimer Optionen
-    private val _selectedWorkTimer = MutableStateFlow(2)
-    val selectedWorkTimer: StateFlow<Int> = _selectedWorkTimer
+    private val _selectedWorkBreak = MutableStateFlow(2)
+    val selectedWorkBreak: StateFlow<Int> = _selectedWorkBreak
+
+    private val _selectedSessionBreak = MutableStateFlow(2)
+    val selectedSessionBreak: StateFlow<Int> = _selectedSessionBreak
+
+    private val _sessionCount = MutableStateFlow(1)
+    val sessionCountValue: StateFlow<Int> = _sessionCount
+
+
 
     init {
         // Einstellungen laden
@@ -33,16 +41,22 @@ class SettingsViewModel @Inject constructor(private val repository: SettingsRepo
     private fun loadSettings() {
         viewModelScope.launch {
             // Dark Mode Einstellung sammeln
-            repository.getDarkMode().collect { darkMode ->
+            repository.getDarkMode().collect{darkMode ->
                 _isDarkMode.value = darkMode
             }
             // Benachrichtigungseinstellungen sammeln
-            repository.getNotification().collect { notificationsEnabled ->
+            repository.getNotification().collect{notificationsEnabled ->
                 _notificationsEnabled.value = notificationsEnabled
             }
             // Timer Option sammeln
-            repository.getWorkTimer().collect { timerOption ->
-                _selectedWorkTimer.value = timerOption
+            repository.getWorkBreak().collect{workBreakOption ->
+                _selectedWorkBreak.value = workBreakOption
+            }
+            repository.getSessionBreak().collect{sessionBreakOption ->
+                _selectedSessionBreak.value = sessionBreakOption
+            }
+            repository.getSessionCount().collect{sessionCount ->
+                _sessionCount.value = sessionCount
             }
         }
     }
@@ -61,10 +75,24 @@ class SettingsViewModel @Inject constructor(private val repository: SettingsRepo
         }
     }
 
-    fun setWorkTimerOption(option: Int){
+    fun setWorkBreakOption(option: Int){
         viewModelScope.launch {
-            repository.saveWorkTimerOption(option)
-            _selectedWorkTimer.value = option
+            repository.saveWorkBreakOption(option)
+            _selectedWorkBreak.value = option
+        }
+    }
+
+    fun setSessioBreakOption(option: Int){
+        viewModelScope.launch {
+            repository.saveSessionBreakOption(option)
+            _selectedSessionBreak.value = option
+        }
+    }
+
+    fun setSessionCount(value: Int){
+        viewModelScope.launch {
+            repository.saveSessionCount(value)
+            _sessionCount.value = value
         }
     }
 }

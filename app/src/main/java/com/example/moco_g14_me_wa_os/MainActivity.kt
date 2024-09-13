@@ -4,8 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.moco_g14_me_wa_os.Settings.SettingsViewModel
 import com.example.moco_g14_me_wa_os.ui.theme.Moco_G14_Me_Wa_OsTheme
@@ -24,6 +29,9 @@ class MainActivity : ComponentActivity() {
             val isDarkMode by viewModel.isDarkMode.collectAsState()
 
             Moco_G14_Me_Wa_OsTheme (darkTheme = isDarkMode) {
+                val backgroundColor = MaterialTheme.colorScheme.background
+
+                Box(modifier = Modifier.fillMaxSize().background(backgroundColor))
                 MainNavigation()
             }
         }
