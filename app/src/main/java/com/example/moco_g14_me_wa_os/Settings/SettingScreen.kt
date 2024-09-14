@@ -1,23 +1,17 @@
 package com.example.moco_g14_me_wa_os.Settings
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.moco_g14_me_wa_os.ui.theme.Moco_G14_Me_Wa_OsTheme
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
@@ -33,28 +27,42 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
     var textValue by remember { mutableStateOf(sessionCount.toString()) }
     var errorState by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.padding(8.dp).padding(top = 24.dp).fillMaxSize(),
+    Column(modifier = Modifier
+        .padding(8.dp)
+        .padding(top = 24.dp)
+        .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start) {
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center) {
             Text("Settings",
                 style = TextStyle(fontSize = 24.sp),
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.ExtraBold,
                 color = colors.onPrimary)
         }
         // Dark Mode Switch
         Row(
             modifier = Modifier
-                .fillMaxWidth().padding(top = 16.dp),
+                .fillMaxWidth()
+                .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Dark Mode",
+                fontWeight = FontWeight.Bold,
+                style = TextStyle(fontSize = 16.sp),
                 color = colors.onPrimary)
             Switch(
                 checked = isDarkMode,
-                onCheckedChange = {viewModel.toggleDarkmode(it)}
+                onCheckedChange = {viewModel.toggleDarkmode(it)},
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = colors.secondary,     // Farbe des Knopfs, wenn aktiviert
+                    uncheckedThumbColor = colors.onPrimary,       // Farbe des Knopfs, wenn deaktiviert
+                    checkedTrackColor = colors.primary,        // Farbe des Tracks, wenn aktiviert
+                    uncheckedTrackColor = colors.primary,
+                    uncheckedBorderColor = colors.onPrimary,      // **Border color when unchecked**
+                    checkedBorderColor = colors.secondary
+                )
             )
         }
 
@@ -65,18 +73,30 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Enable Notifications",
+                fontWeight = FontWeight.Bold,
+                style = TextStyle(fontSize = 16.sp),
                 color = colors.onPrimary)
             Switch(
                 checked = notificationsEnabled,
-                onCheckedChange = {viewModel.toggleNotifications(it) }
+                onCheckedChange = {viewModel.toggleNotifications(it)},
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = colors.secondary,       // Farbe des Knopfs, wenn aktiviert
+                    uncheckedThumbColor = colors.onPrimary,       // Farbe des Knopfs, wenn deaktiviert
+                    checkedTrackColor = colors.primary,        // Farbe des Tracks, wenn aktiviert
+                    uncheckedTrackColor = colors.primary,
+                    uncheckedBorderColor = colors.onPrimary,      // **Border color when unchecked**
+                    checkedBorderColor = colors.secondary
+                )
             )
         }
 
         // WorkBreak
         Text("Work Break Duration",
-            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
-            style = TextStyle(),
-            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .padding(bottom = 8.dp),
+            style = TextStyle(fontSize = 16.sp),
+            fontWeight = FontWeight.Bold,
             color = colors.onPrimary)
 
         val workBreakOptions = listOf(5,10) // Timer Optionen in Minuten
@@ -87,19 +107,26 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("$option minutes",
+                    fontWeight = FontWeight.SemiBold,
                     color = colors.onPrimary)
                 RadioButton(
                     selected = (selectedWorkBreakOption == option),
-                    onClick = {viewModel.setWorkBreakOption(option)}
+                    onClick = {viewModel.setWorkBreakOption(option)},
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = colors.secondary,        // Farbe, wenn ausgewählt
+                        unselectedColor = colors.onPrimary,
+                        )
                 )
             }
         }
 
         // SessionBreak
         Text("Session Break Duration",
-            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
-            style = TextStyle(),
-            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .padding(bottom = 8.dp),
+            style = TextStyle(fontSize = 16.sp),
+            fontWeight = FontWeight.Bold,
             color = colors.onPrimary)
 
         val sessionBreakOptions = listOf(15,30) // Timer Optionen in Minuten
@@ -111,17 +138,25 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "$option minutes",
+                    fontWeight = FontWeight.SemiBold,
                     color = colors.onPrimary)
                 RadioButton(
-                    selected = (selectedSessionBreakOption == option), // noch andere states im Repository machen, geht aktuell alles über worktimer
-                    onClick = {viewModel.setSessioBreakOption(option)}
+                    selected = (selectedSessionBreakOption == option),
+                    onClick = {viewModel.setSessioBreakOption(option)},
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = colors.secondary,
+                        unselectedColor = colors.onPrimary,
+                    )
                 )
             }
         }
         // Eingabefeld Sessions
         Text(text = "Sessionanzahl:",
-            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
-            color = colors.onPrimary
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .padding(bottom = 8.dp),
+            color = colors.onPrimary,
+            style = TextStyle(fontSize = 16.sp),
         )
         TextField(
             value = textValue,
@@ -144,7 +179,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
             },
             label = { Text("Input") },
             modifier = Modifier.fillMaxWidth(),
-            isError = errorState // Textfeld wird rot markiert, wenn der Fehlerzustand aktiv ist
         )
         // Optionaler Fehlertext
         if (errorState) {
@@ -176,7 +210,8 @@ fun SettingsScreenPreview(viewModel: SettingsViewModel = hiltViewModel()) {
         // Dark Mode Switch
         Row(
             modifier = Modifier
-                .fillMaxWidth().padding(top = 16.dp),
+                .fillMaxWidth()
+                .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -202,7 +237,9 @@ fun SettingsScreenPreview(viewModel: SettingsViewModel = hiltViewModel()) {
         }
 
         // WorkBreak
-        Text(text = "Work Break Duration", modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
+        Text(text = "Work Break Duration", modifier = Modifier
+            .padding(top = 16.dp)
+            .padding(bottom = 8.dp),
             style = TextStyle(),
             fontWeight = FontWeight.SemiBold)
 
@@ -224,7 +261,9 @@ fun SettingsScreenPreview(viewModel: SettingsViewModel = hiltViewModel()) {
 
         // SessionBreak
         Text(text = "Session Break Duration",
-            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .padding(bottom = 8.dp),
             style = TextStyle(),
             fontWeight = FontWeight.SemiBold)
 
@@ -246,7 +285,9 @@ fun SettingsScreenPreview(viewModel: SettingsViewModel = hiltViewModel()) {
 
         // Eingabefeld hinzufügen
         Text(text = "Sessionanzahl:",
-            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .padding(bottom = 8.dp),
             color = colors.onPrimary
         )
         TextField(

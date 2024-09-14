@@ -13,11 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = DodopilotDarkBlue,
+    primary = DodoAirDarkButtonBlue,
     onPrimary = DodopilotGray,
-    secondary = DodopilotDarkYellow,
+    secondary = DodopilotYellow,
     onSecondary = DodopilotWhite,
-    background = DodopilotText,
+    background = DodoAirDarkBlue,
     surface = DodopilotDarkBlue,
     onSurface = DodopilotWhite,
     error = DodopilotYellow,
@@ -25,15 +25,15 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = DodopilotBlue,
-    onPrimary = DodopilotText,
-    secondary = DodopilotYellow,
-    onSecondary = DodopilotDarkBlue,
-    background = DodopilotWhite,
-    surface = DodopilotGray,
+    primary = DodoAirLightButtonBlue,
+    onPrimary = DodoAirLightBlack,
+    secondary = DodoAirYellow,
+    onSecondary = DodoAirYellow,
+    background = DodoAirLightBlue,
+    surface = DodoAirYellow,
     onSurface = DodopilotDarkBlue,
-    error = DodopilotDarkYellow,
-    onError = DodopilotText
+    error = DodopilotYellow,
+    onError = DodoAirDarkWhite
 )
 
 @Composable
