@@ -120,7 +120,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
         }
         // Eingabefeld Sessions
         Text(text = "Sessionanzahl:",
-            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp)
+            modifier = Modifier.padding(top = 16.dp).padding(bottom = 8.dp),
+            color = colors.onPrimary
         )
         TextField(
             value = textValue,
