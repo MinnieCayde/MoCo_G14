@@ -88,7 +88,7 @@ fun LeftScreen(navController: NavController){
 fun MiddleScreen(navController: NavController) {
     val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
     val context = LocalContext.current
-    TimerScreen(timerViewModel = timerViewModel)
+    TimerScreen(timerViewModel)
     LaunchedEffect(Unit) {
         startTimerService(context)
     }

@@ -7,83 +7,102 @@ import android.os.Binder
 import android.os.CountDownTimer
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moco_g14_me_wa_os.MainActivity
-import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
-import com.squareup.wire.get
+import kotlinx.coroutines.Job
+import android.app.Service
+import android.content.ContentValues.TAG
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PomodoroTimerService : Service() {
-    private lateinit var timer: CountDownTimer
-    private var timeLeftInMillis = 30*60*1000L
-    private var isTimerRunning = false
     private var callback: ((Long) -> Unit)? = null
 
     private val binder = LocalBinder()
+    private var ispaused :Boolean = false
+    var duration = 0L
+    private var timerJob: Job? = null
+    private lateinit var dataStore: TimerPreferencesDataStore
 
     inner class LocalBinder : Binder() {
         fun getService(): PomodoroTimerService = this@PomodoroTimerService
     }
+    override fun onCreate() {
+        super.onCreate()
+        dataStore = TimerPreferencesDataStore(applicationContext)
 
-    override fun onBind(intent: Intent): IBinder {
-        return binder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = createNotification("")
-        startForeground(NOTIFICATION_ID, notification)
-
-        return START_STICKY
+        startForeground(NOTIFICATION_ID,createNotification("Timer service started"))
+        return START_NOT_STICKY
+    }
+    override fun onBind(intent: Intent): IBinder {
+        return binder
     }
 
     fun setCallback(cb: (Long) -> Unit) {
         callback = cb
     }
 
-    fun startTimer() {
-        if (!isTimerRunning) {
-            timer = object : CountDownTimer(timeLeftInMillis, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                    timeLeftInMillis = millisUntilFinished
-                    callback?.invoke(timeLeftInMillis)
-                    updateNotification()
+    fun startTimer(totaltime : MutableStateFlow<Long>, viewModel : PomodoroTimerViewModel) {
+        if (!viewModel.isRunning.value && timerJob == null) {
+            viewModel._isRunning.value = true
+            updateNotification("Timer started")
+            timerJob = CoroutineScope(Dispatchers.Default).launch {
+                if (!ispaused) {
+                    duration = totaltime.value
+                    viewModel._remainingTime.value = duration
                 }
-
-                override fun onFinish() {
-                    isTimerRunning = false
-                    updateNotification("Pomodoro finished!")
-                    stopSelf() //stop service once timer finished
+                while (viewModel._remainingTime.value > 0) {
+                    delay(1000)
+                    viewModel._remainingTime.value -= 1000
+                    withContext(Dispatchers.Main) {
+                        callback?.invoke(viewModel._remainingTime.value)
+                    }
+                    updateNotification("Remaining time: ${viewModel._remainingTime.value / 1000} seconds")
                 }
-            }.start()
+                viewModel.onTimerComplete()
+                sendTimerCompletionNotification()
+                timerJob = null
 
-            isTimerRunning = true
-            updateNotification()
+            }
         }
     }
 
-    fun pauseTimer() {
-        if (isTimerRunning) {
-            timer.cancel()
-            isTimerRunning = false
-            updateNotification()
+    fun pauseTimer(viewModel: PomodoroTimerViewModel) {
+        if (viewModel.isRunning.value){
+        timerJob?.cancel()
+        viewModel._isRunning.value= false
+        timerJob = null
+        ispaused = true
+        updateNotification("Timer paused")}
+    }
+
+    fun resetTimer(viewModel: PomodoroTimerViewModel) {
+        pauseTimer(viewModel)
+        CoroutineScope(Dispatchers.Default).launch {
+            val duration = dataStore.timerDurationFlow.first()
+            viewModel._remainingTime.value = duration * 60 * 1000L
+            callback?.invoke(viewModel._remainingTime.value)
         }
     }
 
-    fun resetTimer() {
-        if (::timer.isInitialized) {
-            timer.cancel()
-        }
-        timeLeftInMillis = 25 * 60 * 1000L
-        isTimerRunning = false
-        callback?.invoke(timeLeftInMillis)
-        updateNotification()
-    }
+
 
     private fun updateNotification(contentText: String = "Timer is running") {
+        Log.d(TAG, "Updating notification: '$contentText'")
         val notification = createNotification(contentText)
         startForeground(NOTIFICATION_ID, notification)
+        Log.d(TAG, "Notification updated and startForeground called with content: '$contentText'")
     }
     private fun createNotification(contentText: String): Notification {
-        // Verwenden Sie den vollständigen Paketnamen für MainActivity
+        Log.d(TAG, "Creating notification with content: '$contentText'")
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -113,5 +132,36 @@ class PomodoroTimerService : Service() {
 
     companion object {
         private const val NOTIFICATION_ID = 1
+    }
+    private fun sendTimerCompletionNotification() {
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val channelId = "pomodoro_timer_channel"
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Pomodoro Timer",
+                NotificationManager.IMPORTANCE_HIGH // Wichtigere Benachrichtigung
+            )
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setContentTitle("Pomodoro Timer Completed")
+            .setContentText("Good job! Time for a break.")
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true) // Schließt die Benachrichtigung automatisch nach dem Tippen
+            .build()
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(2, notification) // Sende die Benachrichtigung mit einer neuen ID
     }
 }
