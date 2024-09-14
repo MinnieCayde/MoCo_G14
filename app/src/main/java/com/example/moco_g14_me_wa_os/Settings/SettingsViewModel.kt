@@ -1,5 +1,6 @@
 package com.example.moco_g14_me_wa_os.Settings
 
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,10 +23,10 @@ class SettingsViewModel @Inject constructor(private val repository: SettingsRepo
     val notificationsEnabled: StateFlow<Boolean> = _notificationsEnabled
 
     //Flow für Worktimer Optionen
-    private val _selectedWorkBreak = MutableStateFlow(2)
+    private val _selectedWorkBreak = MutableStateFlow(5)
     val selectedWorkBreak: StateFlow<Int> = _selectedWorkBreak
 
-    private val _selectedSessionBreak = MutableStateFlow(2)
+    private val _selectedSessionBreak = MutableStateFlow(15)
     val selectedSessionBreak: StateFlow<Int> = _selectedSessionBreak
 
     private val _sessionCount = MutableStateFlow(1)
@@ -34,7 +35,6 @@ class SettingsViewModel @Inject constructor(private val repository: SettingsRepo
 
 
     init {
-        // Einstellungen laden
         loadSettings()
     }
 

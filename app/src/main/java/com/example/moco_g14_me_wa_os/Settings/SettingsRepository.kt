@@ -30,7 +30,7 @@ class SettingsRepository @Inject constructor(private val context: Context) {
         return context.datastore.data.map { preferences -> preferences[NOTIFICATION_KEY] ?: true }
     }
     fun getWorkBreak(): Flow<Int> {
-        return context.datastore.data.map { preferences -> preferences[WORK_BREAK_OPTION_KEY] ?: 25 }
+        return context.datastore.data.map { preferences -> preferences[WORK_BREAK_OPTION_KEY] ?: 5}
     }
     fun getSessionBreak(): Flow<Int> {
         return context.datastore.data.map { prefereces -> prefereces[SESSION_BREAK_OPTION_KEY] ?: 15 }
