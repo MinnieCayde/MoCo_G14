@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import com.example.moco_g14_me_wa_os.Settings.SettingsScreen
+import com.example.moco_g14_me_wa_os.Settings.SettingsViewModel
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerService
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import kotlinx.coroutines.launch
@@ -83,7 +85,7 @@ fun LeftScreen(navController: NavController){
 fun MiddleScreen(navController: NavController) {
     val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
     val context = LocalContext.current
-    TimerScreen(timerViewModel = timerViewModel)
+    TimerScreen(timerViewModel)
     LaunchedEffect(Unit) {
         startTimerService(context)
     }
@@ -96,6 +98,7 @@ private fun startTimerService(context: android.content.Context){
 
 @Composable
 fun RightScreen(navController: NavController) {
-    // Content for the right screen
-    Text(text = "Right Screen")
+    val settingsViewModel : SettingsViewModel = hiltViewModel()
+
+    SettingsScreen(viewModel = settingsViewModel)
 }

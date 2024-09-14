@@ -7,5 +7,15 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="primary">#1B023B</color>
+    <color name="Secondary">#FF03DAC5</color>
+
+    <color name="Foregroundcolor">#CB73B5</color>
+    <color name="Backgroundcolor">#65396B</color>
+    <color name="DarkModePurple">#472940</color>
+
+    <color name="DodoFeathersTurquoise">#4AB6E1</color>
+    <color name="DodoBeakOrange">#EB6150</color>
     <color name="green">#027148</color>
 </resources>

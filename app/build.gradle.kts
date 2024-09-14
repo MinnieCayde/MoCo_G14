@@ -44,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.0"
     }
     packaging {
         resources {
@@ -54,6 +54,13 @@ android {
 }
 
 dependencies {
+
+    implementation ("androidx.preference:preference:1.2.0")
+
+
+
+    implementation ("com.airbnb.android:lottie-compose:4.0.0")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -69,12 +76,26 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.androidx.hilt.compiler)
 
+
+    //DataStore
+    implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.datastore.preferences.core.jvm)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.material3)
+
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences.rxjava2)
+    implementation(libs.androidx.datastore.preferences.rxjava3)
+    implementation(libs.androidx.datastore.core)
+
     // Compose UI
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -87,7 +108,6 @@ dependencies {
 
     // Optional: Preview functionality
     implementation(libs.androidx.ui.tooling.preview)
-
     // Room components
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

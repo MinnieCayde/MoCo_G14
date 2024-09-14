@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/DarkModePurple">
+
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+        
+        <TextView
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:layout_centerInParent="true"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="18dp" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/profile_pic_cropped"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:text="ExampleUser"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="22dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="@drawable/rounded_turquoise_button"
+                android:text="Edit User"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:paddingStart="30dp"
+                android:paddingEnd="30dp"/>
+
+            <!-- Dark Mode Element-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_purple_button_background"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="40dp"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <!-- Dark Mode Switch-->
+                <RelativeLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/darkModeIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:background="@drawable/rounded_dark_mode_background"
+                        android:src="@drawable/dark_mode_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="Dark Mode"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:layout_toEndOf="@id/darkModeIcon"
+                        android:layout_marginStart="20dp"/>
+                    
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:theme="@style/nightModeSwitch"/>
+
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+            <!-- Session Selections-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_purple_button_background"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <!-- Promodoro Length-->
+                <RelativeLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/sessionIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:background="@drawable/rounded_dark_mode_background"
+                        android:src="@drawable/computer_icon"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        android:text="Sessions"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:layout_marginStart="20dp"
+                        android:layout_toEndOf="@+id/sessionIcon"/>
+
+                </RelativeLayout>
+
+                <!-- 3 Buttons-->
+                <LinearLayout
+                        android:gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ToggleButton
+                            android:clickable="true"
+                            android:id="@+id/toggleOption1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textOn="2"
+                            android:textOff="2"
+                            android:background="@drawable/inactive_rounded_time_selectors"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:layout_marginRight="10dp"/>
+
+                        <ToggleButton
+                            android:clickable="true"
+                            android:id="@+id/toggleOption2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textOn="4"
+                            android:textOff="4"
+                            android:background="@drawable/inactive_rounded_time_selectors"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"/>
+
+                        <ToggleButton
+                            android:clickable="true"
+                            android:id="@+id/toggleOption3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textOn="6"
+                            android:textOff="6"
+                            android:background="@drawable/inactive_rounded_time_selectors"
+                            android:textColor="@color/white"
+                            android:layout_marginLeft="10dp"
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
+
+                <!-- Long Break timer-->
+                <RelativeLayout
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/breakIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:background="@drawable/rounded_dark_mode_background"
+                        android:src="@drawable/long_break_icon"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        android:text="Session Break"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:layout_marginStart="20dp"
+                        android:layout_toEndOf="@+id/breakIcon"/>
+
+                </RelativeLayout>
+                <!-- Buttons-->
+                <LinearLayout
+                    android:gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ToggleButton
+                        android:clickable="true"
+                        android:textAllCaps="false"
+                        android:id="@+id/longBreakTimeOption1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn="15 min"
+                        android:textOff="15 min"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/inactive_rounded_time_selectors"
+                        android:layout_marginHorizontal="5dp"/>
+
+                    <ToggleButton
+                        android:clickable="true"
+                        android:textAllCaps="false"
+                        android:id="@+id/longBreakTimeOption2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn="30 min"
+                        android:textOff="30 min"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/inactive_rounded_time_selectors"
+                        android:layout_marginHorizontal="5dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Session Break Option-->
+
+            <!-- Timer Management-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_purple_button_background"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <!-- Work timer-->
+                <RelativeLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/workIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:background="@drawable/rounded_dark_mode_background"
+                        android:src="@drawable/work_icon"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        android:text="Work Duration"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:layout_marginStart="20dp"
+                        android:layout_toEndOf="@+id/workIcon"/>
+
+                </RelativeLayout>
+                <!-- Buttons-->
+                <LinearLayout
+                    android:gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ToggleButton
+                        android:clickable="true"
+                        android:textAllCaps="false"
+                        android:id="@+id/workTimeOption1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn="25 min"
+                        android:textOff="25 min"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/inactive_rounded_time_selectors"
+                        android:layout_marginHorizontal="5dp"/>
+
+                    <ToggleButton
+                        android:clickable="true"
+                        android:textAllCaps="false"
+                        android:id="@+id/workTimeOption2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn="45 min"
+                        android:textOff="45 min"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/inactive_rounded_time_selectors"
+                        android:layout_marginHorizontal="5dp"/>
+
+                </LinearLayout>
+
+                <!-- short Break timer-->
+                <RelativeLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/workBreakIcon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="10dp"
+                    android:background="@drawable/rounded_dark_mode_background"
+                    android:src="@drawable/break_icon"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:text="Work Break"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginStart="20dp"
+                    android:layout_toEndOf="@+id/workBreakIcon"/>
+
+                </RelativeLayout>
+
+                <!-- Buttons-->
+                <LinearLayout
+                    android:gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ToggleButton
+                        android:clickable="true"
+                        android:textAllCaps="false"
+                        android:id="@+id/shortBreakTimeOption1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn="5 min"
+                        android:textOff="5 min"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/inactive_rounded_time_selectors"
+                        android:layout_marginHorizontal="5dp"/>
+
+                    <ToggleButton
+                        android:clickable="true"
+                        android:textAllCaps="false"
+                        android:id="@+id/shortBreakTimeOption2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn="10 min"
+                        android:textOff="10 min"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/inactive_rounded_time_selectors"
+                        android:layout_marginHorizontal="5dp"/>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
