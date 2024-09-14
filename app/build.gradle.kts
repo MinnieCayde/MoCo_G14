@@ -57,6 +57,11 @@ dependencies {
 
     implementation ("androidx.preference:preference:1.2.0")
 
+
+
+    implementation ("com.airbnb.android:lottie-compose:4.0.0")
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -77,6 +82,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core.jvm)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
 
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -102,7 +108,6 @@ dependencies {
 
     // Optional: Preview functionality
     implementation(libs.androidx.ui.tooling.preview)
-
     // Room components
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

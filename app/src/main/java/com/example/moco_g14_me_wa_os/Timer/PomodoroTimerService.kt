@@ -11,7 +11,9 @@ import com.example.moco_g14_me_wa_os.MainActivity
 import kotlinx.coroutines.Job
 import android.app.Service
 import android.content.ContentValues.TAG
+import android.media.RingtoneManager
 import android.util.Log
+import com.example.moco_g14_me_wa_os.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -34,15 +36,18 @@ class PomodoroTimerService : Service() {
     }
     override fun onCreate() {
         super.onCreate()
+        Log.d(TAG, "Service onCreate called")
         dataStore = TimerPreferencesDataStore(applicationContext)
 
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "Service onStartCommand called")
         startForeground(NOTIFICATION_ID,createNotification("Timer service started"))
         return START_NOT_STICKY
     }
     override fun onBind(intent: Intent): IBinder {
+        Log.d(TAG, "Service onBind called")
         return binder
     }
 
@@ -103,6 +108,7 @@ class PomodoroTimerService : Service() {
     }
     private fun createNotification(contentText: String): Notification {
         Log.d(TAG, "Creating notification with content: '$contentText'")
+        val channelID = getString(R.string.pomodoro_timer_channel_id)
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -131,9 +137,12 @@ class PomodoroTimerService : Service() {
     }
 
     companion object {
+        private const val TAG = "PomodoroTimerService"
         private const val NOTIFICATION_ID = 1
     }
     private fun sendTimerCompletionNotification() {
+        Log.d(TAG, "PomodoroCompleted")
+        val channelID = getString(R.string.pomodoro_timer_completion_channel_id)
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -158,6 +167,7 @@ class PomodoroTimerService : Service() {
             .setContentText("Good job! Time for a break.")
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentIntent(pendingIntent)
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
             .setAutoCancel(true) // Schließt die Benachrichtigung automatisch nach dem Tippen
             .build()
 
