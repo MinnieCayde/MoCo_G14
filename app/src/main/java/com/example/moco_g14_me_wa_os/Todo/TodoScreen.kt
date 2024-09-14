@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Button
@@ -43,13 +44,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @Composable
-fun TododScreen(todoViewModel: TodoViewModel) {
+fun TododScreen() {
 
     val todoViewModel: TodoViewModel = hiltViewModel()
 
@@ -120,8 +122,9 @@ fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task
                 task = task,
                 taskName = task.name,
                 description = task.description,
+                priority = task.priority,
                 completed = task.completed,
-                onTaskClick = { onTaskClick(task)},
+                onTaskClick = { updatedTask -> onTaskClick(updatedTask) },
                 onTaskRemove = { onTaskRemove(task) }
             )
         }
@@ -133,12 +136,13 @@ fun TaskCard(
     task: Task,
     taskName: String,
     description: String,
+    priority: Int,
     completed: Boolean,
-    onTaskClick: () -> Unit,
+    onTaskClick: (Task) -> Unit,
     onTaskRemove: (Task) -> Unit
 ) {
     // Track task is clicked or not
-    var isClicked by remember { mutableStateOf(false) }
+   // var isClicked by remember { mutableStateOf(false) }
 
     if (completed) {
         LaunchedEffect(key1 = task) {
@@ -153,11 +157,11 @@ fun TaskCard(
             .height(90.dp)
             .padding(5.dp)
             .clickable {
-                isClicked = !isClicked
-                onTaskClick()
+                onTaskClick(task.copy(isClicked = !task.isClicked))
             },
-        elevation = if (isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(
+        elevation = if (task.isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(
+            8.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
@@ -171,35 +175,54 @@ fun TaskCard(
             // Change the button color when clicked
             IconButton(
                 onClick = {
-                    isClicked = !isClicked
-                    onTaskClick()
+                    onTaskClick(task.copy(isClicked = !task.isClicked))
                 },
                 modifier = Modifier.size(48.dp)  // Adjust button size
             ) {
                 Image(
                     painter = painterResource(id = if (completed) R.drawable.checked_24 else R.drawable.unchecked_24),
                     contentDescription = "Complete",
-                    colorFilter = ColorFilter.tint(if (isClicked) Color.Cyan else Color.Black)
+                    colorFilter = ColorFilter.tint(if (task.isClicked) Color.Cyan else Color.Black)
                 )
             }
 
-            // Change text color when clicked
-            Text(
-                text = taskName,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
-            )
+            /*Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+              //  horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
-            )
+             */
+                // Change text color when clicked
+                Text(
+                    text = taskName,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
+                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = description,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Dodo's left: ${task.priority}",
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
     }
-}
-
+//}
 
 @Composable
 fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
@@ -366,6 +389,7 @@ fun TaskCardPreview() {
         task = Task(name = "Mock Task", description = "This is a preview of a task card", completed = false),
         taskName = "Mock Task",
         description = "This is a preview of a task card",
+        priority = 1,
         completed = false,
         onTaskClick = { /* No action for preview */ },
         onTaskRemove = { /* No action for preview */ }

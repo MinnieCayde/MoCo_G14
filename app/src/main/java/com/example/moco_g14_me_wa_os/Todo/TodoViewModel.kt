@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import java.util.UUID
 
 import javax.inject.Inject
 
@@ -32,7 +33,11 @@ class TodoViewModel @Inject constructor(private val repository: TodoRepository) 
         repository.delete(task)
     }
 
-    fun deleteTaskById(taskId: Int) = viewModelScope.launch {
+    fun deleteTaskById(taskId: UUID) = viewModelScope.launch {
         repository.deleteTaskById(taskId)
+    }
+
+    fun onTaskClick(task: Task) = viewModelScope.launch {
+       update(task.copy(isClicked = !task.isClicked))
     }
 }
