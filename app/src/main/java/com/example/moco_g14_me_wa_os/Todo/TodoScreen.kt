@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import com.example.moco_g14_me_wa_os.R
@@ -48,6 +47,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 
 
 @Composable
@@ -228,7 +229,7 @@ fun TaskCard(
 fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var selectedPriority by remember { mutableIntStateOf(1) }
+    var numberDurations by remember { mutableIntStateOf(1) }
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -254,12 +255,12 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Priority: $selectedPriority",
+            text = "Dodo's: $numberDurations",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-       NumberPickerDialog(initialNumber = selectedPriority, onNumberSelected = { priority -> selectedPriority = priority })
+       NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { priority -> numberDurations = priority })
 
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -277,9 +278,15 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
 fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     var isDialogOpen by remember { mutableStateOf(false) }
     var selectedNumber by remember { mutableStateOf(initialNumber) }
-    var scrollState = rememberLazyListState()
 
-    // Button to open the number picker
+    // Numbers from 1 to 10
+    val numbers = (1..10).toList()
+    // Repeated list to simulate an infinite scroll
+    val infiniteNumbers = List(1000) { numbers[it % numbers.size] }
+    val middleIndex = infiniteNumbers.size / 2
+    // LazyListState to handle the initial index
+    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = middleIndex + initialNumber - 1)
+
     Button(
         onClick = { isDialogOpen = true },
         modifier = Modifier.padding(16.dp)
@@ -288,74 +295,85 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     }
 
     if (isDialogOpen) {
-        // Show a Dialog with a LazyColumn inside it
         Dialog(onDismissRequest = {
             isDialogOpen = false
-            val middleIndex = scrollState.firstVisibleItemIndex + 2
-            selectedNumber = middleIndex + 1
+            // Select the number based on the visible item in the middle
+            val selectedIndex = (scrollState.firstVisibleItemIndex + 2) % numbers.size
+            selectedNumber = numbers[selectedIndex]
             onNumberSelected(selectedNumber)
         }) {
-            Box(
+            Card(
                 modifier = Modifier
-                    .size(200.dp)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp)
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp)), // Ensure rounded corners
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
             ) {
-                // "selector" in Dialog
-                LazyColumn(
-                    state = scrollState,
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    // Display numbers
-                    items(10) { index ->
-                        val number = index + 1
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp)
-                                .padding(vertical = 8.dp)
-                                .clickable {
-                                    selectedNumber = number
-                                    onNumberSelected(number)
-                                    isDialogOpen = false
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = number.toString(),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = if (number == selectedNumber) Color.Black else Color.Gray
-                            )
-                        }
-                    }
-                }
-                // box for selecting, top and bottom Lines
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .align(Alignment.Center)
+                        .size(200.dp)
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp)) // Clip for rounded corners
                 ) {
+                    LazyColumn(
+                        state = scrollState,
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        // Display the infinite number list
+                        items(infiniteNumbers.size) { index ->
+                            val number = infiniteNumbers[index]
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                                    .padding(vertical = 8.dp)
+                                    .clickable {
+                                        selectedNumber = number
+                                        onNumberSelected(number)
+                                        isDialogOpen = false
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = number.toString(),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (number == selectedNumber) Color.Black else Color.Gray
+                                )
+                            }
+                        }
+                    }
+                    // Box for selecting, with top and bottom lines
                     Box(
                         modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .height(1.dp)
-                            .fillMaxWidth(0.8f)
-                            .background(Color.Gray)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .height(1.dp)
-                            .fillMaxWidth(0.8f)
-                            .background(Color.Gray)
-                    )
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .align(Alignment.Center)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .height(1.dp)
+                                .fillMaxWidth(0.8f)
+                                .background(Color.Gray)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .height(1.dp)
+                                .fillMaxWidth(0.8f)
+                                .background(Color.Gray)
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+
+
 @Preview(showBackground = true)
 @Composable
 fun TodoScreenPreview() {
