@@ -3,7 +3,10 @@ package com.example.moco_g14_me_wa_os
 
 import TimerScreen
 import android.content.Intent
+import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.pager.HorizontalPager
@@ -20,7 +23,10 @@ import com.example.moco_g14_me_wa_os.Todo.TododScreen
 import com.example.moco_g14_me_wa_os.Todo.TodoViewModel
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,19 +62,27 @@ fun MainNavigation() {
                 2 -> RightScreen(navController = navController)   // Right screen
             }
         }
+
+
         // Buttons at the bottom
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+                .background(MaterialTheme.colorScheme.onSecondary,
+                RoundedCornerShape(16.dp)).height(60.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Bottom
         ) {
-            Button(onClick = { coroutineScope.launch { pagerState.animateScrollToPage(0) }}){
+
+            Button(modifier = Modifier.padding(8.dp),
+                onClick = { coroutineScope.launch { pagerState.animateScrollToPage(0) }}){
                 Text(text = "Todo")
             }
-            Button(onClick = { coroutineScope.launch { pagerState.animateScrollToPage(1) }}) {
+            Button(modifier = Modifier.padding(8.dp),
+                onClick = { coroutineScope.launch { pagerState.animateScrollToPage(1) }}) {
                 Text(text = "Timer")
             }
-            Button(onClick = { coroutineScope.launch { pagerState.animateScrollToPage(2) }}) {
+            Button(modifier = Modifier.padding(8.dp),
+                onClick = { coroutineScope.launch { pagerState.animateScrollToPage(2) }}) {
                 Text(text = "Settings")
             }
         }
