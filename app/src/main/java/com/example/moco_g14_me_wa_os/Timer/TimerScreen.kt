@@ -23,6 +23,8 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.annotation.RequiresApi
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable.ArrowDirection
+import androidx.compose.ui.res.painterResource
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -61,7 +63,7 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth().height(500.dp).background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(16.dp))
         ) {
             // Circular Progress Indicator overlaying the animation
             Box(modifier = Modifier.size(250.dp)) {
@@ -76,7 +78,7 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                 AnimatedPreloader(
                     modifier = Modifier
                         .size(200.dp)
-                        .align(Alignment.Center)
+                        .align(Alignment.Center).padding(end = 30.dp)
                 )
             }
 
@@ -86,7 +88,7 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
             Text(
                 text = formatSeconds(remainingTime),
                 style = MaterialTheme.typography.headlineLarge.copy(fontSize = 48.sp),
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .clickable { if (!isRunning) isFullScreenMode = true }
@@ -117,8 +119,9 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
+                    .fillMaxWidth()
+                    .height(500.dp)
+                    .background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(16.dp))
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, _, _ ->
                             val adjustment = pan.y * sensitivity
@@ -140,12 +143,16 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                         viewModel.setWorkDuration(currentSliderValue.roundToInt())
                     }
             ) {
+                Icon(modifier = Modifier.align(Alignment.TopCenter).padding(top = 60.dp).size(56.dp),painter = painterResource(id = R.drawable.timer_scroll_up), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary)
+
                 Text(
                     text = formatMinutes(currentSliderValue),
                     style = MaterialTheme.typography.headlineLarge.copy(fontSize = 72.sp),
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.align(Alignment.Center)
                 )
+
+                Icon(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(56.dp), painter = painterResource(id = R.drawable.timer_scroll_down), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary )
             }
         }
     }

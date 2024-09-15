@@ -17,7 +17,7 @@ val DodoAirYellow = Color(0xFFFFDC44)
 //Light Color Theme (Final)
 val DodoAirLightBlue = Color(0xFF0B9ED9)
 val DodoAirLightGroupingBlue = Color(0xFF086A96)
-val DodoAirLightButtonBlue = Color(0xFF0982C2)
+val DodoAirLightButtonBlue = Color(0xFF0B89CB)
 
 val DodoAirLightBlack = Color(0xFF000000)
 

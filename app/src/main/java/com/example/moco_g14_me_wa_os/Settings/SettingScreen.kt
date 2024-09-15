@@ -233,7 +233,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
                 style = TextStyle(fontSize = 16.sp),
                 fontWeight = FontWeight.SemiBold
             )
-            TextField(
+            OutlinedTextField(
                 value = textValue,
                 onValueChange = { newValue ->
                     textValue = newValue // Lokalen Zustand updaten
@@ -252,7 +252,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
                         errorState = true
                     }
                 },
-                label = { Text("Input") },
                 modifier = Modifier.fillMaxWidth(fraction = 0.95f).padding(start = 8.dp),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = colors.primary,             // Hintergrundfarbe des Textfeldes bei Fokus

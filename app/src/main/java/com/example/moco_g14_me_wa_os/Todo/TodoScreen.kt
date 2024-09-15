@@ -48,7 +48,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.modifier.modifierLocalProvider
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 
 
 @Composable
@@ -66,8 +71,8 @@ fun TododScreen() {
             FloatingActionButton(onClick = {
                 // Show the NewTaskForm dialog
                 showNewTaskDialog = true
-            }) {
-                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task")
+            }, containerColor = MaterialTheme.colorScheme.primary) {
+                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task", tint = MaterialTheme.colorScheme.onPrimary)
             }
         },
         content = { paddingValues ->
@@ -163,7 +168,7 @@ fun TaskCard(
         elevation = if (task.isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(
             8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.onSecondary
         )
     ) {
         Row(
@@ -183,7 +188,7 @@ fun TaskCard(
                 Image(
                     painter = painterResource(id = if (completed) R.drawable.checked_24 else R.drawable.unchecked_24),
                     contentDescription = "Complete",
-                    colorFilter = ColorFilter.tint(if (task.isClicked) Color.Cyan else Color.Black)
+                    colorFilter = ColorFilter.tint(if (task.isClicked) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onPrimary)
                 )
             }
                 // Change text color when clicked
@@ -191,7 +196,7 @@ fun TaskCard(
                     text = taskName,
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
-                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
+                    color = if (task.isClicked) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
@@ -208,7 +213,7 @@ fun TaskCard(
                     text = "Dodo's left: ${task.sessions}",
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -220,46 +225,82 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var numberDurations by remember { mutableIntStateOf(1) }
-
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
-        Text(text = "New Task", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(vertical = 16.dp))
-
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Dodo's: $numberDurations",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-       NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { priority -> numberDurations = priority })
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { onSaveClick(name, description) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.onSecondary) // Hintergrundfarbe für den gesamten Screen
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         ) {
-            Text("Save")
+            Text(
+                text = "New Task",
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Description") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedTextColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Dodo's: $numberDurations",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            NumberPickerDialog(
+                initialNumber = numberDurations,
+                onNumberSelected = { priority -> numberDurations = priority })
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { onSaveClick(name, description) },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+            ) {
+                Text("Save")
+            }
         }
     }
 }

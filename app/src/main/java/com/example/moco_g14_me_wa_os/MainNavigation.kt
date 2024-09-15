@@ -48,7 +48,7 @@ fun MainNavigation() {
     val coroutineScope = rememberCoroutineScope()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         HorizontalPager(
