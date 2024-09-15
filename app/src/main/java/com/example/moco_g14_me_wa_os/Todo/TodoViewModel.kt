@@ -3,6 +3,7 @@ package com.example.moco_g14_me_wa_os.Todo
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
+import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,9 +16,9 @@ import javax.inject.Inject
 class TodoViewModel @Inject constructor(private val repository: TodoRepository) : ViewModel() {
     val allTasks: StateFlow<List<Task>> = repository.allTasks
         .stateIn(
-            scope = viewModelScope,             // Scope for launching coroutines
-            started = SharingStarted.WhileSubscribed(5000),  // Strategy to start the flow
-            initialValue = emptyList()           // Initial value for StateFlow
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
         )
 
 
@@ -38,6 +39,24 @@ class TodoViewModel @Inject constructor(private val repository: TodoRepository) 
     }
 
     fun onTaskClick(task: Task) = viewModelScope.launch {
-       update(task.copy(isClicked = !task.isClicked))
+        update(task.copy(isClicked = !task.isClicked))
+    }
+
+    fun observerTimerViewModel(timerViewModel: PomodoroTimerViewModel) {
+        viewModelScope.launch {
+            timerViewModel.onSessionCompleted.collect { completedTask ->
+
+                if (completedTask != null) {
+                    // Decrement sessions for all tasks with sessions > 0
+                    allTasks.value.forEach { task ->
+                        if (task.sessions > 0) {
+                            update(task.copy(sessions = task.sessions - 1))
+                        }
+                    }
+                    timerViewModel._onSessionCompleted.value = null
+
+                }
+            }
+        }
     }
 }

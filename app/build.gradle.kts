@@ -56,10 +56,8 @@ android {
 dependencies {
 
     implementation ("androidx.preference:preference:1.2.0")
-
-
-
     implementation ("com.airbnb.android:lottie-compose:4.0.0")
+
 
 
     implementation(libs.androidx.core.ktx)

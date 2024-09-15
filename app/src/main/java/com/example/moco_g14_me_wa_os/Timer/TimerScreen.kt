@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
+
     val remainingTime by viewModel.remainingTime.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
     val totalTime by viewModel.totalTime.collectAsState()
@@ -36,11 +37,10 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
     var currentSliderValue by remember { mutableStateOf((totalTime / (60 * 1000)).toFloat()) }
     var isFullScreenMode by remember { mutableStateOf(false) }
     val completedPomodoros by viewModel.completedPomodoros.collectAsState()
-    var lastVibratedValue by remember { mutableStateOf(0) }
+
     val context = LocalContext.current
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.eggblue_animation))
     val lottieAnimatable = rememberLottieAnimatable()
-
 
     LaunchedEffect(composition) {
         lottieAnimatable.animate(composition, iterations = LottieConstants.IterateForever)
@@ -112,11 +112,6 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
 
         // Fullscreen Mode for setting the timer
         if (isFullScreenMode) {
-            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            val sensitivity = 0.02f
-            val minValue = 1f
-            val maxValue = 60f
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -124,18 +119,11 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                     .background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(16.dp))
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, _, _ ->
-                            val adjustment = pan.y * sensitivity
-                            val newValue = ((currentSliderValue - adjustment - minValue) % (maxValue - minValue) + (maxValue - minValue)) % (maxValue - minValue) + minValue
-
-                            if (newValue.roundToInt() != lastVibratedValue) {
-                                // Haptisches Feedback nur bei Wertänderung
-                                val vibrationEffect = VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE)
-                                vibrator.vibrate(vibrationEffect)
-                                lastVibratedValue = newValue.roundToInt()
-                            }
-
+                            val sensitivity = 0.05f
+                            val adjustment = (pan.y * sensitivity).toFloat()
+                            val newValue = (currentSliderValue - adjustment).coerceIn(0.5f, 60f)
                             currentSliderValue = newValue
-                            viewModel.setWorkDuration(currentSliderValue.roundToInt())
+                            viewModel.setWorkDuration(newValue.roundToInt())
                         }
                     }
                     .clickable {

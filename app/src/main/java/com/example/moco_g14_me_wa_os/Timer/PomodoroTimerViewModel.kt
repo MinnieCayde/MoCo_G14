@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.viewModelScope
 import com.example.moco_g14_me_wa_os.Settings.SettingsRepository
+import com.example.moco_g14_me_wa_os.Todo.Task
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -105,38 +106,35 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
         _isRunning.value = false
     }
 
-    open fun resetTimer() {
-        timerService?.resetTimer(this)
-        _isRunning.value = false
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        getApplication<Application>().unbindService(serviceConnection)
-    }
     open fun onTimerComplete() {
         _isRunning.value = false
-        if(state.value == State.Work){
+        if (state.value == State.Work) {
             _completedPomodoros.value++
+            _onSessionCompleted.value = Task(name = "", description = "", sessions = 0, completed = false)
             if (isLongBreakRequired()) _state.value = State.Longbreak
             else _state.value = State.Shortbreak
-        }
-        else {
+        } else {
             _state.value = State.Work
         }
 
-
-        val nextTimerDuration = when (state.value){
+        val nextTimerDuration = when (state.value) {
             State.Work -> workTime.value
             State.Longbreak -> sessionBreak.value
             State.Shortbreak -> workBreak.value
         }
         _totalTime.value = nextTimerDuration
         _remainingTime.value = nextTimerDuration
-
     }
 
 
+    open fun resetTimer() {
+        timerService?.resetTimer(this)
+        _isRunning.value = false
+    }
+    override fun onCleared() {
+        super.onCleared()
+        getApplication<Application>().unbindService(serviceConnection)
+    }
 
     // Logik zur Entscheidung, ob eine lange Pause erforderlich ist (kann angepasst werden)
     private fun isLongBreakRequired():  Boolean {
@@ -157,6 +155,16 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
 
     fun updateRemainingTime(newTime: Long) {
         _remainingTime.value = newTime
+    }
+
+    internal val _onSessionCompleted = MutableStateFlow<Task?>(null)
+    val onSessionCompleted = _onSessionCompleted.asStateFlow()
+
+    private val _currentTask = MutableStateFlow<Task?>(null)
+    val currentTask: StateFlow<Task?> = _currentTask.asStateFlow()
+
+    fun setCurrentTask(task: Task) {
+        _currentTask.value = task
     }
 }
 
