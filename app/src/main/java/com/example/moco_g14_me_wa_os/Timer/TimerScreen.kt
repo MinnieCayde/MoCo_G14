@@ -17,6 +17,13 @@ import com.example.moco_g14_me_wa_os.R
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import androidx.annotation.RequiresApi
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
     val remainingTime by viewModel.remainingTime.collectAsState()
@@ -26,10 +33,11 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
     var currentSliderValue by remember { mutableStateOf((totalTime / (60 * 1000)).toFloat()) }
     var isFullScreenMode by remember { mutableStateOf(false) }
     val completedPomodoros by viewModel.completedPomodoros.collectAsState()
-
+    var lastVibratedValue by remember { mutableStateOf(0) }
     val context = LocalContext.current
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.eggblue_animation))
     val lottieAnimatable = rememberLottieAnimatable()
+
 
     LaunchedEffect(composition) {
         lottieAnimatable.animate(composition, iterations = LottieConstants.IterateForever)
@@ -101,17 +109,29 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
 
         // Fullscreen Mode for setting the timer
         if (isFullScreenMode) {
+            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            val sensitivity = 0.02f
+            val minValue = 1f
+            val maxValue = 60f
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black)
+                    .background(Color.White)
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, _, _ ->
-                            val sensitivity = 0.05f
-                            val adjustment = (pan.y * sensitivity).toFloat()
-                            val newValue = (currentSliderValue - adjustment).coerceIn(0.5f, 60f)
+                            val adjustment = pan.y * sensitivity
+                            val newValue = ((currentSliderValue - adjustment - minValue) % (maxValue - minValue) + (maxValue - minValue)) % (maxValue - minValue) + minValue
+
+                            if (newValue.roundToInt() != lastVibratedValue) {
+                                // Haptisches Feedback nur bei Wertänderung
+                                val vibrationEffect = VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE)
+                                vibrator.vibrate(vibrationEffect)
+                                lastVibratedValue = newValue.roundToInt()
+                            }
+
                             currentSliderValue = newValue
-                            viewModel.setWorkDuration(newValue.roundToInt())
+                            viewModel.setWorkDuration(currentSliderValue.roundToInt())
                         }
                     }
                     .clickable {
@@ -122,7 +142,7 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                 Text(
                     text = formatMinutes(currentSliderValue),
                     style = MaterialTheme.typography.headlineLarge.copy(fontSize = 72.sp),
-                    color = Color.White,
+                    color = Color.Black,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
