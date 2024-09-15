@@ -1,6 +1,7 @@
 package com.example.moco_g14_me_wa_os.Todo
 
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 import javax.inject.Inject
 
 
@@ -20,7 +21,7 @@ class TodoRepository @Inject constructor(private val todoDao: TodoDao) {
         todoDao.deleteTask(task)
     }
 
-    suspend fun deleteTaskById(taskId: Int) {
+    suspend fun deleteTaskById(taskId: UUID) {
         todoDao.deleteTaskById(taskId)
     }
 }

@@ -78,10 +78,7 @@ fun MainNavigation() {
 
 @Composable
 fun LeftScreen(navController: NavController){
-    val todoViewModel: TodoViewModel = hiltViewModel()
-
-    TododScreen(todoViewModel = todoViewModel)
-
+    TododScreen()
 }
 
 @Composable

@@ -9,4 +9,6 @@ data class Task (
     val name: String,
     val description: String,
     var completed: Boolean = false,
+    var sessions: Int = 1,
+    var isClicked: Boolean = false,
     @PrimaryKey val taskID: UUID = UUID.randomUUID())
