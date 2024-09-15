@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainNavigation() {
 
-    val navController = rememberNavController()
     val pagerState = rememberPagerState(1) { 3 }
     val coroutineScope = rememberCoroutineScope()
 
@@ -51,9 +50,9 @@ fun MainNavigation() {
             modifier = Modifier.weight(1f)
         ) { page ->
             when (page) {
-                0 -> LeftScreen(navController = navController)       // Left screen
-                1 -> MiddleScreen(navController = navController)  // Middle screen
-                2 -> RightScreen(navController = navController)   // Right screen
+                0 -> LeftScreen()       // Left screen
+                1 -> MiddleScreen()  // Middle screen
+                2 -> RightScreen()   // Right screen
             }
         }
         // Buttons at the bottom
@@ -77,12 +76,12 @@ fun MainNavigation() {
 
 
 @Composable
-fun LeftScreen(navController: NavController){
+fun LeftScreen(){
     TododScreen()
 }
 
 @Composable
-fun MiddleScreen(navController: NavController) {
+fun MiddleScreen() {
     val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
     val context = LocalContext.current
     TimerScreen(timerViewModel)
@@ -97,7 +96,7 @@ private fun startTimerService(context: android.content.Context){
 
 
 @Composable
-fun RightScreen(navController: NavController) {
+fun RightScreen() {
     val settingsViewModel : SettingsViewModel = hiltViewModel()
 
     SettingsScreen(viewModel = settingsViewModel)

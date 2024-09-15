@@ -48,13 +48,21 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardColors
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.colorResource
+import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 
 
 @Composable
 fun TododScreen() {
 
     val todoViewModel: TodoViewModel = hiltViewModel()
+    val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
+
+    LaunchedEffect(Unit){
+        todoViewModel.observerTimerViewModel(timerViewModel)
+    }
 
     val tasks by todoViewModel.allTasks.collectAsState()
 
@@ -67,7 +75,7 @@ fun TododScreen() {
                 // Show the NewTaskForm dialog
                 showNewTaskDialog = true
             }) {
-                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task")
+                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Todo")
             }
         },
         content = { paddingValues ->
@@ -101,9 +109,9 @@ fun TododScreen() {
                         elevation = CardDefaults.cardElevation(8.dp),
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        NewTaskForm(onSaveClick = { name, description ->
+                        NewTaskForm(onSaveClick = { name, description, numberDurations ->
                             // Handle task creation logic
-                            todoViewModel.insert(Task(name = name, description = description, completed = false))
+                            todoViewModel.insert(Task(name = name, description = description, sessions = numberDurations, completed = false))
                             showNewTaskDialog = false
                         })
                     }
@@ -142,8 +150,12 @@ fun TaskCard(
     onTaskClick: (Task) -> Unit,
     onTaskRemove: (Task) -> Unit
 ) {
-    // Track task is clicked or not
-   // var isClicked by remember { mutableStateOf(false) }
+   val cardColor = when{
+       sessions > 5 -> colorResource(id = R.color.purple_200)
+       sessions in 3..5 -> colorResource(id = R.color.purple_500)
+       sessions in 1..2 -> colorResource(id = R.color.purple_700)
+       else -> colorResource(id = R.color.green)
+   }
 
     if (completed) {
         LaunchedEffect(key1 = task) {
@@ -163,7 +175,7 @@ fun TaskCard(
         elevation = if (task.isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(
             8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            contentColor = cardColor
         )
     ) {
         Row(
@@ -178,7 +190,7 @@ fun TaskCard(
                 onClick = {
                     onTaskClick(task.copy(isClicked = !task.isClicked))
                 },
-                modifier = Modifier.size(48.dp)  // Adjust button size
+                modifier = Modifier.size(48.dp)
             ) {
                 Image(
                     painter = painterResource(id = if (completed) R.drawable.checked_24 else R.drawable.unchecked_24),
@@ -205,7 +217,7 @@ fun TaskCard(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "Dodo's left: ${task.sessions}",
+                    text = "Dodo's left: $sessions",
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -216,7 +228,7 @@ fun TaskCard(
 
 
 @Composable
-fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
+fun NewTaskForm(onSaveClick: (String, String, Int) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var numberDurations by remember { mutableIntStateOf(1) }
@@ -250,13 +262,13 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-       NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { priority -> numberDurations = priority })
+       NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { sessions -> numberDurations = sessions })
 
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { onSaveClick(name, description) },
+            onClick = { onSaveClick(name, description, numberDurations) },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
         ) {
             Text("Save")
@@ -281,7 +293,7 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
         onClick = { isDialogOpen = true },
         modifier = Modifier.padding(16.dp)
     ) {
-        Text("Priority: $selectedNumber")
+        Text("Do in Dodo's: $selectedNumber")
     }
 
     if (isDialogOpen) {
@@ -362,69 +374,3 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     }
 }
 
-
-
-@Preview(showBackground = true)
-@Composable
-fun TodoScreenPreview() {
-
-    val tasks = listOf(
-        Task(name = "Mock Task 1", description = "This is a mock task", completed = false),
-        Task(name = "Mock Task 2", description = "Another mock task", completed = true)
-    )
-
-
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = { /* No action for preview */ }) {
-                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task")
-            }
-        }
-    ) { paddingValues ->
-        TaskList(
-            tasks = tasks,
-            onTaskClick = { /* No action for preview */ },
-            onTaskRemove = { /* No action for preview */ },
-            modifier = Modifier.padding(paddingValues)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TaskCardPreview() {
-    TaskCard(
-        task = Task(name = "Mock Task", description = "This is a preview of a task card", completed = false),
-        taskName = "Mock Task",
-        description = "This is a preview of a task card",
-        sessions = 1,
-        completed = false,
-        onTaskClick = { /* No action for preview */ },
-        onTaskRemove = { /* No action for preview */ }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun NewTaskFormPreview() {
-    NewTaskForm(onSaveClick = { name, description ->
-        // No real action needed in the preview
-    })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TaskListPreview() {
-
-    val tasks = listOf(
-        Task(name = "Mock Task 1", description = "This is the first task", completed = false),
-        Task(name = "Mock Task 2", description = "This is the second task", completed = true),
-        Task(name = "Mock Task 3", description = "This is the third task", completed = false)
-    )
-
-    TaskList(
-        tasks = tasks,
-        onTaskClick = { /* No action for preview */ },
-        onTaskRemove = { /* No action for preview */ }
-    )
-}

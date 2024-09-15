@@ -17,8 +17,10 @@ import com.example.moco_g14_me_wa_os.R
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
+
 @Composable
 fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
+
     val remainingTime by viewModel.remainingTime.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
     val totalTime by viewModel.totalTime.collectAsState()
