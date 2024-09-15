@@ -18,5 +18,6 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="checkbox">Complete Task</string>
     <string name="placeholder">Placeholder</string>
-
+    <string name="pomodoro_timer_channel_id">pomodoro_timer_channel</string>
+    <string name="pomodoro_timer_completion_channel_id">pomodoro_timer_completion_channel</string>
 </resources>

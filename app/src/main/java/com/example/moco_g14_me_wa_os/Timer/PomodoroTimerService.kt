@@ -11,7 +11,9 @@ import com.example.moco_g14_me_wa_os.MainActivity
 import kotlinx.coroutines.Job
 import android.app.Service
 import android.content.ContentValues.TAG
+import android.media.RingtoneManager
 import android.util.Log
+import com.example.moco_g14_me_wa_os.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,7 +26,7 @@ class PomodoroTimerService : Service() {
     private var callback: ((Long) -> Unit)? = null
 
     private val binder = LocalBinder()
-    private var ispaused :Boolean = false
+    private var ispaused: Boolean = false
     var duration = 0L
     private var timerJob: Job? = null
     private lateinit var dataStore: TimerPreferencesDataStore
@@ -32,17 +34,23 @@ class PomodoroTimerService : Service() {
     inner class LocalBinder : Binder() {
         fun getService(): PomodoroTimerService = this@PomodoroTimerService
     }
+
     override fun onCreate() {
         super.onCreate()
+        Log.d(TAG, "Service onCreate called")
+        createNotificationChannelIfNeeded()
         dataStore = TimerPreferencesDataStore(applicationContext)
 
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOTIFICATION_ID,createNotification("Timer service started"))
+        Log.d(TAG, "Service onStartCommand called")
+        startForeground(NOTIFICATION_ID, createNotification("Timer service started"))
         return START_NOT_STICKY
     }
+
     override fun onBind(intent: Intent): IBinder {
+        Log.d(TAG, "Service onBind called")
         return binder
     }
 
@@ -50,7 +58,7 @@ class PomodoroTimerService : Service() {
         callback = cb
     }
 
-    fun startTimer(totaltime : MutableStateFlow<Long>, viewModel : PomodoroTimerViewModel) {
+    fun startTimer(totaltime: MutableStateFlow<Long>, viewModel: PomodoroTimerViewModel) {
         if (!viewModel.isRunning.value && timerJob == null) {
             viewModel._isRunning.value = true
             updateNotification("Timer started")
@@ -76,12 +84,13 @@ class PomodoroTimerService : Service() {
     }
 
     fun pauseTimer(viewModel: PomodoroTimerViewModel) {
-        if (viewModel.isRunning.value){
-        timerJob?.cancel()
-        viewModel._isRunning.value= false
-        timerJob = null
-        ispaused = true
-        updateNotification("Timer paused")}
+        if (viewModel.isRunning.value) {
+            timerJob?.cancel()
+            viewModel._isRunning.value = false
+            timerJob = null
+            ispaused = true
+            updateNotification("Timer paused")
+        }
     }
 
     fun resetTimer(viewModel: PomodoroTimerViewModel) {
@@ -94,6 +103,19 @@ class PomodoroTimerService : Service() {
     }
 
 
+    private fun createNotificationChannelIfNeeded() {
+        val channelId = CHANNEL_ID
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Pomodoro Timer",
+                NotificationManager.IMPORTANCE_HIGH // Wähle die Wichtigkeit je nach Benachrichtigungstyp
+            )
+            Log.d(TAG, "Creating notification channel: $channelId")
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
     private fun updateNotification(contentText: String = "Timer is running") {
         Log.d(TAG, "Updating notification: '$contentText'")
@@ -101,6 +123,7 @@ class PomodoroTimerService : Service() {
         startForeground(NOTIFICATION_ID, notification)
         Log.d(TAG, "Notification updated and startForeground called with content: '$contentText'")
     }
+
     private fun createNotification(contentText: String): Notification {
         Log.d(TAG, "Creating notification with content: '$contentText'")
         val notificationIntent = Intent(this, MainActivity::class.java)
@@ -111,18 +134,7 @@ class PomodoroTimerService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val channelId = "pomodoro_timer_channel"
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Pomodoro Timer",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        return NotificationCompat.Builder(this, channelId)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Pomodoro Timer")
             .setContentText(contentText)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
@@ -130,10 +142,8 @@ class PomodoroTimerService : Service() {
             .build()
     }
 
-    companion object {
-        private const val NOTIFICATION_ID = 1
-    }
     private fun sendTimerCompletionNotification() {
+        Log.d(TAG, "PomodoroCompleted")
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -142,26 +152,24 @@ class PomodoroTimerService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val channelId = "pomodoro_timer_channel"
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Pomodoro Timer",
-                NotificationManager.IMPORTANCE_HIGH // Wichtigere Benachrichtigung
-            )
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val notification = NotificationCompat.Builder(this, channelId)
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Pomodoro Timer Completed")
             .setContentText("Good job! Time for a break.")
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentIntent(pendingIntent)
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
             .setAutoCancel(true) // Schließt die Benachrichtigung automatisch nach dem Tippen
             .build()
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(2, notification) // Sende die Benachrichtigung mit einer neuen ID
+        notificationManager.notify(NOTIFICATION_ID_COMPLETION, notification) // Sende die Benachrichtigung mit einer neuen ID
     }
+
+    companion object {
+        private const val TAG = "PomodoroTimerService"
+        private const val NOTIFICATION_ID = 1
+        private const val NOTIFICATION_ID_COMPLETION = 2
+        private const val CHANNEL_ID = "pomodoro_timer_channel"
+    }
+
 }

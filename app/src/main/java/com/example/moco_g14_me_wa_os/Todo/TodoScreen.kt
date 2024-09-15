@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import com.example.moco_g14_me_wa_os.R
@@ -43,13 +43,16 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 
 
 @Composable
-fun TododScreen(todoViewModel: TodoViewModel) {
+fun TododScreen() {
 
     val todoViewModel: TodoViewModel = hiltViewModel()
 
@@ -120,8 +123,9 @@ fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task
                 task = task,
                 taskName = task.name,
                 description = task.description,
+                sessions = task.sessions,
                 completed = task.completed,
-                onTaskClick = { onTaskClick(task)},
+                onTaskClick = { updatedTask -> onTaskClick(updatedTask) },
                 onTaskRemove = { onTaskRemove(task) }
             )
         }
@@ -133,12 +137,13 @@ fun TaskCard(
     task: Task,
     taskName: String,
     description: String,
+    sessions: Int,
     completed: Boolean,
-    onTaskClick: () -> Unit,
+    onTaskClick: (Task) -> Unit,
     onTaskRemove: (Task) -> Unit
 ) {
     // Track task is clicked or not
-    var isClicked by remember { mutableStateOf(false) }
+   // var isClicked by remember { mutableStateOf(false) }
 
     if (completed) {
         LaunchedEffect(key1 = task) {
@@ -153,11 +158,11 @@ fun TaskCard(
             .height(90.dp)
             .padding(5.dp)
             .clickable {
-                isClicked = !isClicked
-                onTaskClick()
+                onTaskClick(task.copy(isClicked = !task.isClicked))
             },
-        elevation = if (isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(
+        elevation = if (task.isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(
+            8.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
@@ -171,41 +176,50 @@ fun TaskCard(
             // Change the button color when clicked
             IconButton(
                 onClick = {
-                    isClicked = !isClicked
-                    onTaskClick()
+                    onTaskClick(task.copy(isClicked = !task.isClicked))
                 },
                 modifier = Modifier.size(48.dp)  // Adjust button size
             ) {
                 Image(
                     painter = painterResource(id = if (completed) R.drawable.checked_24 else R.drawable.unchecked_24),
                     contentDescription = "Complete",
-                    colorFilter = ColorFilter.tint(if (isClicked) Color.Cyan else Color.Black)
+                    colorFilter = ColorFilter.tint(if (task.isClicked) Color.Cyan else Color.Black)
                 )
             }
+                // Change text color when clicked
+                Text(
+                    text = taskName,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
+                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.width(8.dp))
 
-            // Change text color when clicked
-            Text(
-                text = taskName,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
-            )
+                Text(
+                    text = description,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
+                )
 
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
-            )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Dodo's left: ${task.sessions}",
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
     }
-}
 
 
 @Composable
 fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var selectedPriority by remember { mutableIntStateOf(1) }
+    var numberDurations by remember { mutableIntStateOf(1) }
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -231,12 +245,12 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Priority: $selectedPriority",
+            text = "Dodo's: $numberDurations",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-       NumberPickerDialog(initialNumber = selectedPriority, onNumberSelected = { priority -> selectedPriority = priority })
+       NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { priority -> numberDurations = priority })
 
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -254,9 +268,15 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
 fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     var isDialogOpen by remember { mutableStateOf(false) }
     var selectedNumber by remember { mutableStateOf(initialNumber) }
-    var scrollState = rememberLazyListState()
 
-    // Button to open the number picker
+    // Numbers from 1 to 10
+    val numbers = (1..10).toList()
+    // Repeated list to simulate an infinite scroll
+    val infiniteNumbers = List(1000) { numbers[it % numbers.size] }
+    val middleIndex = infiniteNumbers.size / 2
+    // LazyListState to handle the initial index
+    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = middleIndex + initialNumber - 1)
+
     Button(
         onClick = { isDialogOpen = true },
         modifier = Modifier.padding(16.dp)
@@ -265,74 +285,85 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     }
 
     if (isDialogOpen) {
-        // Show a Dialog with a LazyColumn inside it
         Dialog(onDismissRequest = {
             isDialogOpen = false
-            val middleIndex = scrollState.firstVisibleItemIndex + 2
-            selectedNumber = middleIndex + 1
+            // Select the number based on the visible item in the middle
+            val selectedIndex = (scrollState.firstVisibleItemIndex + 2) % numbers.size
+            selectedNumber = numbers[selectedIndex]
             onNumberSelected(selectedNumber)
         }) {
-            Box(
+            Card(
                 modifier = Modifier
-                    .size(200.dp)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp)
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp)), // Ensure rounded corners
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
             ) {
-                // "selector" in Dialog
-                LazyColumn(
-                    state = scrollState,
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    // Display numbers
-                    items(10) { index ->
-                        val number = index + 1
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp)
-                                .padding(vertical = 8.dp)
-                                .clickable {
-                                    selectedNumber = number
-                                    onNumberSelected(number)
-                                    isDialogOpen = false
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = number.toString(),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = if (number == selectedNumber) Color.Black else Color.Gray
-                            )
-                        }
-                    }
-                }
-                // box for selecting, top and bottom Lines
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .align(Alignment.Center)
+                        .size(200.dp)
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp)) // Clip for rounded corners
                 ) {
+                    LazyColumn(
+                        state = scrollState,
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        // Display the infinite number list
+                        items(infiniteNumbers.size) { index ->
+                            val number = infiniteNumbers[index]
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                                    .padding(vertical = 8.dp)
+                                    .clickable {
+                                        selectedNumber = number
+                                        onNumberSelected(number)
+                                        isDialogOpen = false
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = number.toString(),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (number == selectedNumber) Color.Black else Color.Gray
+                                )
+                            }
+                        }
+                    }
+                    // Box for selecting, with top and bottom lines
                     Box(
                         modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .height(1.dp)
-                            .fillMaxWidth(0.8f)
-                            .background(Color.Gray)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .height(1.dp)
-                            .fillMaxWidth(0.8f)
-                            .background(Color.Gray)
-                    )
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .align(Alignment.Center)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .height(1.dp)
+                                .fillMaxWidth(0.8f)
+                                .background(Color.Gray)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .height(1.dp)
+                                .fillMaxWidth(0.8f)
+                                .background(Color.Gray)
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+
+
 @Preview(showBackground = true)
 @Composable
 fun TodoScreenPreview() {
@@ -366,6 +397,7 @@ fun TaskCardPreview() {
         task = Task(name = "Mock Task", description = "This is a preview of a task card", completed = false),
         taskName = "Mock Task",
         description = "This is a preview of a task card",
+        sessions = 1,
         completed = false,
         onTaskClick = { /* No action for preview */ },
         onTaskRemove = { /* No action for preview */ }
