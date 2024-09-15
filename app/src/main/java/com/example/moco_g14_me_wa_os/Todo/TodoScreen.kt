@@ -339,7 +339,7 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
                     .clip(RoundedCornerShape(16.dp)), // Ensure rounded corners
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary)
             ) {
                 Box(
                     modifier = Modifier
