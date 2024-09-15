@@ -123,7 +123,7 @@ fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task
                 task = task,
                 taskName = task.name,
                 description = task.description,
-                priority = task.priority,
+                sessions = task.sessions,
                 completed = task.completed,
                 onTaskClick = { updatedTask -> onTaskClick(updatedTask) },
                 onTaskRemove = { onTaskRemove(task) }
@@ -137,7 +137,7 @@ fun TaskCard(
     task: Task,
     taskName: String,
     description: String,
-    priority: Int,
+    sessions: Int,
     completed: Boolean,
     onTaskClick: (Task) -> Unit,
     onTaskRemove: (Task) -> Unit
@@ -186,16 +186,6 @@ fun TaskCard(
                     colorFilter = ColorFilter.tint(if (task.isClicked) Color.Cyan else Color.Black)
                 )
             }
-
-            /*Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-              //  horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-             */
                 // Change text color when clicked
                 Text(
                     text = taskName,
@@ -215,7 +205,7 @@ fun TaskCard(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "Dodo's left: ${task.priority}",
+                    text = "Dodo's left: ${task.sessions}",
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -223,7 +213,7 @@ fun TaskCard(
             }
         }
     }
-//}
+
 
 @Composable
 fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
@@ -407,7 +397,7 @@ fun TaskCardPreview() {
         task = Task(name = "Mock Task", description = "This is a preview of a task card", completed = false),
         taskName = "Mock Task",
         description = "This is a preview of a task card",
-        priority = 1,
+        sessions = 1,
         completed = false,
         onTaskClick = { /* No action for preview */ },
         onTaskRemove = { /* No action for preview */ }
