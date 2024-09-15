@@ -13,38 +13,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
-    background = Color(0xFF121212), // Hintergrundfarbe für Dark Theme
-    surface = Color(0xFF1E1E1E),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onBackground = Color.White,
-    onSurface = Color.White
+    primary = DodoAirDarkButtonBlue,
+    onPrimary = DodopilotGray,
+    secondary = DodopilotYellow,
+    onSecondary = DodopilotWhite,
+    background = DodoAirDarkBlue,
+    surface = DodopilotDarkBlue,
+    onSurface = DodopilotWhite,
+    error = DodopilotYellow,
+    onError = DodopilotGray
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = Color(0xFFFFFFFF), // Hintergrundfarbe für Light Theme
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.Black,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black
-
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = DodoAirLightButtonBlue,
+    onPrimary = DodoAirLightBlack,
+    secondary = DodoAirYellow,
+    onSecondary = DodoAirYellow,
+    background = DodoAirLightBlue,
+    surface = DodoAirYellow,
+    onSurface = DodopilotDarkBlue,
+    error = DodopilotYellow,
+    onError = DodoAirDarkWhite
 )
 
 @Composable
