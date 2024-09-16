@@ -50,15 +50,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardColors
 import androidx.compose.runtime.key
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import java.util.UUID
 
+import androidx.compose.ui.modifier.modifierLocalProvider
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 
 
 @Composable
 fun TododScreen() {
+
     val todoViewModel: TodoViewModel = hiltViewModel()
     val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
 
@@ -99,6 +105,7 @@ fun TododScreen() {
                 )
             }
 
+            // Show when the state is true
             if (showNewTaskDialog) {
                 Dialog(
                     onDismissRequest = {
@@ -223,40 +230,73 @@ fun NewTaskForm(onSaveClick: (String, String, Int) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var numberDurations by remember { mutableIntStateOf(1) }
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.onSecondary) // Hintergrundfarbe für den gesamten Screen
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = "New Task",
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
-        Text(text = "New Task", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(vertical = 16.dp))
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
 
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Description") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedTextColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
 
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Dodo's: $numberDurations",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
+            Text(
+                text = "Dodo's: $numberDurations",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.SemiBold
+            )
 
         NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { sessions -> numberDurations = sessions })
 
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = { onSaveClick(name, description, numberDurations) },
@@ -301,7 +341,7 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
                     .clip(RoundedCornerShape(16.dp)), // Ensure rounded corners
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary)
             ) {
                 Box(
                     modifier = Modifier

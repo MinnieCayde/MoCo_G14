@@ -2,14 +2,6 @@ package com.example.moco_g14_me_wa_os.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
 
 // Define Dodopilot-inspired colors
 val DodopilotBlue = Color(0xFF0099CC)
@@ -25,7 +17,7 @@ val DodoAirYellow = Color(0xFFFFDC44)
 //Light Color Theme (Final)
 val DodoAirLightBlue = Color(0xFF0B9ED9)
 val DodoAirLightGroupingBlue = Color(0xFF086A96)
-val DodoAirLightButtonBlue = Color(0xFF065C8A)
+val DodoAirLightButtonBlue = Color(0xFF0B89CB)
 
 val DodoAirLightBlack = Color(0xFF000000)
 

@@ -2,6 +2,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +19,15 @@ import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import androidx.annotation.RequiresApi
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable.ArrowDirection
+import androidx.compose.ui.res.painterResource
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
 
@@ -54,7 +64,7 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth().height(500.dp).background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(16.dp))
         ) {
             // Circular Progress Indicator overlaying the animation
             Box(modifier = Modifier.size(250.dp)) {
@@ -69,7 +79,7 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                 AnimatedPreloader(
                     modifier = Modifier
                         .size(200.dp)
-                        .align(Alignment.Center)
+                        .align(Alignment.Center).padding(end = 30.dp)
                 )
             }
 
@@ -79,7 +89,7 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
             Text(
                 text = formatSeconds(remainingTime),
                 style = MaterialTheme.typography.headlineLarge.copy(fontSize = 48.sp),
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .clickable { if (!isRunning) isFullScreenMode = true }
@@ -105,8 +115,9 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
         if (isFullScreenMode) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
+                    .fillMaxWidth()
+                    .height(500.dp)
+                    .background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(16.dp))
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, _, _ ->
                             val sensitivity = 0.05f
@@ -121,12 +132,16 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                         viewModel.setWorkDuration(currentSliderValue.roundToInt())
                     }
             ) {
+                Icon(modifier = Modifier.align(Alignment.TopCenter).padding(top = 60.dp).size(56.dp),painter = painterResource(id = R.drawable.timer_scroll_up), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary)
+
                 Text(
                     text = formatMinutes(currentSliderValue),
                     style = MaterialTheme.typography.headlineLarge.copy(fontSize = 72.sp),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.align(Alignment.Center)
                 )
+
+                Icon(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(56.dp), painter = painterResource(id = R.drawable.timer_scroll_down), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary )
             }
         }
     }

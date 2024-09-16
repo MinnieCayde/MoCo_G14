@@ -108,7 +108,7 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
 
     open fun onTimerComplete() {
         _isRunning.value = false
-        if (state.value == State.Work) {
+        if(state.value == State.Work){
             _completedPomodoros.value++
             _onSessionCompleted.value = true
              if (isLongBreakRequired()) _state.value = State.Longbreak
