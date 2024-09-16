@@ -25,10 +25,22 @@ import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable.ArrowDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import coil.ImageLoader
+import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter// Für das Laden des GIFs oder Bildes
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import com.example.moco_g14_me_wa_os.Timer.State
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
+
+
 
     val remainingTime by viewModel.remainingTime.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
@@ -38,9 +50,46 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
     var isFullScreenMode by remember { mutableStateOf(false) }
     val completedPomodoros by viewModel.completedPomodoros.collectAsState()
 
+    // Observing the current state (Work, Shortbreak, Longbreak)
+    val currentState by viewModel.state.collectAsState()
+
+    // Check if it's break time
+    val isBreakTime = currentState != State.Work
+
+    // Create an ImageLoader with GIF support
     val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            if (android.os.Build.VERSION.SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory()) // For API 28+
+            } else {
+                add(GifDecoder.Factory()) // For older devices
+            }
+        }
+        .build()
+
+    // Select the GIF resource based on break status and progress
+    val gifResource = when {
+        isBreakTime -> {
+            if (progress < 0.01f) R.drawable.egg_hatching // Schlüpfendes Ei-GIF für den Übergang zur Pause
+            else R.drawable.dodo // Dodo-GIF während der Pausenzeit
+        }
+        else -> {
+            // Arbeitszeit: wähle das GIF abhängig vom Fortschritt
+            when {
+                progress < 0.25f -> R.drawable.egg// 0-25% des Fortschritts
+                progress < 0.5f -> R.drawable.egg_cracked // 25-50% des Fortschritts
+                progress < 0.75f -> R.drawable.egg_more_cracked // 50-75% des Fortschritts
+                else -> R.drawable.egg_very_cracked // 75-100% des Fortschritts
+            }
+        }
+    }
+
+
+
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.eggblue_animation))
     val lottieAnimatable = rememberLottieAnimatable()
+
 
     LaunchedEffect(composition) {
         lottieAnimatable.animate(composition, iterations = LottieConstants.IterateForever)
@@ -60,6 +109,8 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                 .background(backgroundColor)
         )
 
+
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -74,11 +125,19 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                     strokeWidth = 8.dp,
                     trackColor = ProgressIndicatorDefaults.circularTrackColor,
                 )
-                // Animation centered within the circle
-                AnimatedPreloader(
+                // Load the GIF using Coil
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = gifResource,
+                        imageLoader = imageLoader
+                    ),
+                    contentDescription = "Pomodoro GIF",
                     modifier = Modifier
-                        .size(200.dp)
-                        .align(Alignment.Center).padding(end = 30.dp)
+                        .padding(top = 30.dp)
+                        .padding(start = 25.dp)
+                        .size(200.dp), // Set the size of the GIF
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
                 )
             }
 

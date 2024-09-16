@@ -58,6 +58,8 @@ dependencies {
     implementation ("androidx.preference:preference:1.2.0")
     implementation ("com.airbnb.android:lottie-compose:4.0.0")
 
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("io.coil-kt:coil-gif:2.4.0") // Unterstützung für animierte GIFs
 
 
     implementation(libs.androidx.core.ktx)
