@@ -67,7 +67,7 @@ class TodoViewModel @Inject constructor(private val repository: TodoRepository) 
         repository.insert(task)
     }
 
-    fun update(task: Task) = viewModelScope.launch {
+    private fun update(task: Task) = viewModelScope.launch {
         repository.update(task)
     }
 

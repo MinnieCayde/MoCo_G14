@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.viewModelScope
 import com.example.moco_g14_me_wa_os.Settings.SettingsRepository
 import com.example.moco_g14_me_wa_os.Todo.Task
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -118,6 +119,10 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
             _state.value = State.Work
         }
 
+        viewModelScope.launch(Dispatchers.Main) {
+            timerService?.sendTimerCompletionNotification()
+        }
+
         val nextTimerDuration = when (state.value) {
             State.Work -> workTime.value
             State.Longbreak -> sessionBreak.value
@@ -161,7 +166,7 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
         _remainingTime.value = newTime
     }
 
-    internal val _onSessionCompleted = MutableStateFlow(false)
+    private val _onSessionCompleted = MutableStateFlow(false)
     val onSessionCompleted: StateFlow<Boolean> = _onSessionCompleted.asStateFlow()
 
     private val _currentTask = MutableStateFlow<Task?>(null)

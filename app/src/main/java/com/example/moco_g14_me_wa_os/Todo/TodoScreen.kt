@@ -52,14 +52,18 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.moco_g14_me_wa_os.R
+import com.example.moco_g14_me_wa_os.Settings.SettingsViewModel
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
+import com.example.moco_g14_me_wa_os.ui.theme.Cards
 import java.util.UUID
+
 
 @Composable
 fun TodoScreen() {
-
+    val settingViewModel: SettingsViewModel = hiltViewModel()
     val todoViewModel: TodoViewModel = hiltViewModel()
     val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
+
 
     LaunchedEffect(Unit) {
         todoViewModel.observerTimerViewModel(timerViewModel)
@@ -167,12 +171,22 @@ fun TaskCard(
     onTaskRemove: (Task) -> Unit,
     onTaskSelect: (Task) -> Unit
 ) {
-    val cardColor = when {
-        task.sessions > 7 -> colorResource(id = R.color.purple_200)
-        task.sessions in 5..7 -> colorResource(id = R.color.primary)
-        task.sessions in 3..5 -> colorResource(id = R.color.purple_500)
-        task.sessions in 1..2 -> colorResource(id = R.color.purple_700)
-        else -> colorResource(id = R.color.green)
+
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
+    val cardColorLight = when {
+        task.sessions > 7 -> Cards.cardYellow
+        task.sessions in 5..7 -> Cards.cardLightPurple
+        task.sessions in 3..5 -> Cards.cardTeal
+        task.sessions in 1..2 -> Cards.cardLightBlue
+        else -> Cards.cardGreen
+    }
+    val cardColorDark = when {
+        task.sessions > 7 -> Cards.cardOrange
+        task.sessions in 5..7 -> Cards.cardDarkPurple
+        task.sessions in 3..5 -> Cards.cardDarkTeal
+        task.sessions in 1..2 -> Cards.cardBlue
+        else -> Cards.cardGreen
     }
 
     Card(
@@ -186,7 +200,7 @@ fun TaskCard(
                 } else onTaskSelect(task)
             },
         elevation = CardDefaults.cardElevation(8.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor)
+        colors = CardDefaults.cardColors(if (isDarkMode) cardColorDark else cardColorLight)
     ) {
         Row(
             modifier = Modifier
