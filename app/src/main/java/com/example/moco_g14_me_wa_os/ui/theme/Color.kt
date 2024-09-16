@@ -29,17 +29,17 @@ val DodoAirDarkButtonBlue = Color (0xFF064E75)
 val DodoAirDarkWhite = Color(0xFFFFFFFF)
 
 object Cards {
-    val cardLightBlue = Color(0xFF0099CC)
+    val cardLightBlue = Color(0xFF086A96)
     val cardBlue = Color(0xFF0000FF)
 
     val cardLightPurple = Color(0xFF800080)
     val cardDarkPurple = Color(0xFF4B0082)
 
     val cardOrange = Color(0xFFFFA500)
-    val cardYellow = Color(0xFFFFD700)
+    val cardYellow = Color(0xFFFC8B00)
 
     val cardTeal = Color(0xFF008080)
-    val cardDarkTeal = Color(0xFF003452)
+    val cardDarkTeal = Color(0xFF086A96)
 
     val cardGreen = Color(0xFF008000)
 }

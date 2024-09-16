@@ -79,10 +79,11 @@ fun TodoScreen() {
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 showNewTaskDialog = true
-            }) {
+            }, containerColor = MaterialTheme.colorScheme.onSecondary) {
                 Icon(
                     painter = painterResource(id = R.drawable.add_24),
-                    contentDescription = "New Todo"
+                    contentDescription = "New Todo",
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         },
@@ -222,14 +223,14 @@ fun TaskCard(
                 Image(
                     painter = painterResource(id = if (isSelected || task.completed) R.drawable.checked_24 else R.drawable.unchecked_24),
                     contentDescription = "Complete",
-                    colorFilter = ColorFilter.tint(if (isSelected) Color.Green else Color.Black)
+                    colorFilter = ColorFilter.tint(if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onPrimary),
                 )
             }
             Text(
                 text = task.name,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
-                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+                color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -243,7 +244,7 @@ fun TaskCard(
                 text = if (task.completed) "Completed:)" else "Dodo's left: ${task.sessions}",
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
-                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+                color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onPrimary
             )
         }
     }

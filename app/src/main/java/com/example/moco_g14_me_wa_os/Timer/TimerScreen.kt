@@ -27,6 +27,7 @@ import androidx.appcompat.graphics.drawable.DrawerArrowDrawable.ArrowDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import coil.ImageLoader
@@ -165,7 +166,45 @@ fun TimerScreen() {
         }
 
         // Fullscreen Mode for setting the timer
+//        if (isFullScreenMode) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(500.dp)
+//                    .background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(16.dp))
+//                    .pointerInput(Unit) {
+//                        detectTransformGestures { _, pan, _, _ ->
+//                            val sensitivity = 0.05f
+//                            val adjustment = (pan.y * sensitivity).toFloat()
+//                            val newValue = (currentSliderValue - adjustment).coerceIn(0.5f, 60f)
+//                            currentSliderValue = newValue
+//                            viewModel.setWorkDuration(newValue.roundToInt())
+//                        }
+//                    }
+//                    .clickable {
+//                        isFullScreenMode = false
+//                        viewModel.setWorkDuration(currentSliderValue.roundToInt())
+//                    }
+//            ) {
+//                Icon(modifier = Modifier.align(Alignment.TopCenter).padding(top = 60.dp).size(56.dp),painter = painterResource(id = R.drawable.timer_scroll_up), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary)
+//
+//                Text(
+//                    text = formatMinutes(currentSliderValue),
+//                    style = MaterialTheme.typography.headlineLarge.copy(fontSize = 72.sp),
+//                    color = MaterialTheme.colorScheme.onPrimary,
+//                    modifier = Modifier.align(Alignment.Center)
+//                )
+//
+//                Icon(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(56.dp), painter = painterResource(id = R.drawable.timer_scroll_down), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary )
+//            }
+//        }
         if (isFullScreenMode) {
+            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            val sensitivity = 0.02f
+            val minValue = 1f
+            val maxValue = 60f
+            var lastVibratedValue by remember { mutableStateOf(0) }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -173,11 +212,18 @@ fun TimerScreen() {
                     .background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(16.dp))
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, _, _ ->
-                            val sensitivity = 0.05f
-                            val adjustment = (pan.y * sensitivity).toFloat()
-                            val newValue = (currentSliderValue - adjustment).coerceIn(0.5f, 60f)
+                            val adjustment = pan.y * sensitivity
+                            val newValue = ((currentSliderValue - adjustment - minValue) % (maxValue - minValue) + (maxValue - minValue)) % (maxValue - minValue) + minValue
+
+                            if (newValue.roundToInt() != lastVibratedValue) {
+                                // Haptisches Feedback nur bei Wertänderung
+                                val vibrationEffect = VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE)
+                                vibrator.vibrate(vibrationEffect)
+                                lastVibratedValue = newValue.roundToInt()
+                            }
+
                             currentSliderValue = newValue
-                            viewModel.setWorkDuration(newValue.roundToInt())
+                            viewModel.setWorkDuration(currentSliderValue.roundToInt())
                         }
                     }
                     .clickable {
@@ -186,14 +232,12 @@ fun TimerScreen() {
                     }
             ) {
                 Icon(modifier = Modifier.align(Alignment.TopCenter).padding(top = 60.dp).size(56.dp),painter = painterResource(id = R.drawable.timer_scroll_up), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary)
-
                 Text(
                     text = formatMinutes(currentSliderValue),
                     style = MaterialTheme.typography.headlineLarge.copy(fontSize = 72.sp),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.Black,
                     modifier = Modifier.align(Alignment.Center)
                 )
-
                 Icon(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(56.dp), painter = painterResource(id = R.drawable.timer_scroll_down), contentDescription = "Go up", tint = MaterialTheme.colorScheme.onPrimary )
             }
         }
