@@ -1,4 +1,5 @@
 package com.example.moco_g14_me_wa_os.Timer
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import android.app.Application
@@ -13,9 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.viewModelScope
 import com.example.moco_g14_me_wa_os.Settings.SettingsRepository
 import com.example.moco_g14_me_wa_os.Todo.Task
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
 @HiltViewModel
 open class PomodoroTimerViewModel @Inject constructor(application: Application, private val settingsRepository: SettingsRepository) : AndroidViewModel(application) {
 
@@ -108,13 +110,17 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
 
     open fun onTimerComplete() {
         _isRunning.value = false
-        if (state.value == State.Work) {
+        if(state.value == State.Work){
             _completedPomodoros.value++
-            _onSessionCompleted.value = Task(name = "", description = "", sessions = 0, completed = false)
-            if (isLongBreakRequired()) _state.value = State.Longbreak
+            _onSessionCompleted.value = true
+             if (isLongBreakRequired()) _state.value = State.Longbreak
             else _state.value = State.Shortbreak
         } else {
             _state.value = State.Work
+        }
+
+        viewModelScope.launch(Dispatchers.Main) {
+            timerService?.sendTimerCompletionNotification()
         }
 
         val nextTimerDuration = when (state.value) {
@@ -124,6 +130,9 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
         }
         _totalTime.value = nextTimerDuration
         _remainingTime.value = nextTimerDuration
+    }
+    fun resetSessionCompleted() {
+        _onSessionCompleted.value = false
     }
 
 
@@ -146,10 +155,10 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
     }
     fun setWorkDuration(minutes: Int) {
         viewModelScope.launch {
-                dataStore.saveTimerDuration(minutes)
-                _totalTime.value = minutes *60L * 1000L
-                _remainingTime.value = _totalTime.value
-                collectTime()
+            dataStore.saveTimerDuration(minutes)
+            _totalTime.value = minutes *60L * 1000L
+            _remainingTime.value = _totalTime.value
+            collectTime()
         }
     }
 
@@ -157,8 +166,8 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
         _remainingTime.value = newTime
     }
 
-    internal val _onSessionCompleted = MutableStateFlow<Task?>(null)
-    val onSessionCompleted = _onSessionCompleted.asStateFlow()
+    private val _onSessionCompleted = MutableStateFlow(false)
+    val onSessionCompleted: StateFlow<Boolean> = _onSessionCompleted.asStateFlow()
 
     private val _currentTask = MutableStateFlow<Task?>(null)
     val currentTask: StateFlow<Task?> = _currentTask.asStateFlow()

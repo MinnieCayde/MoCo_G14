@@ -15,53 +15,62 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import com.example.moco_g14_me_wa_os.R
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.modifier.modifierLocalProvider
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
+import com.example.moco_g14_me_wa_os.R
+import com.example.moco_g14_me_wa_os.Settings.SettingsViewModel
+import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
+import com.example.moco_g14_me_wa_os.ui.theme.Cards
+import java.util.UUID
 
 
 @Composable
-fun TododScreen() {
-
+fun TodoScreen() {
+    val settingViewModel: SettingsViewModel = hiltViewModel()
     val todoViewModel: TodoViewModel = hiltViewModel()
+    val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
+
+
+    LaunchedEffect(Unit) {
+        todoViewModel.observerTimerViewModel(timerViewModel)
+    }
 
     val tasks by todoViewModel.allTasks.collectAsState()
+    val selectedTaskIds by todoViewModel.selectedTaskIds.collectAsState()
 
     // state to control visibility of the new task form
     var showNewTaskDialog by remember { mutableStateOf(false) }
@@ -69,23 +78,30 @@ fun TododScreen() {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                // Show the NewTaskForm dialog
                 showNewTaskDialog = true
-            }, containerColor = MaterialTheme.colorScheme.primary) {
-                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task", tint = MaterialTheme.colorScheme.onPrimary)
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_24),
+                    contentDescription = "New Todo"
+                )
             }
         },
         content = { paddingValues ->
-            // Apply padding to the content
             Column(modifier = Modifier.padding(paddingValues)) {
                 TaskList(
                     tasks = tasks,
                     onTaskClick = { task ->
-                        todoViewModel.update(task.copy(completed = !task.completed))
+                        if (task.completed) {
+                            todoViewModel.delete(task)
+                        }
                     },
                     onTaskRemove = { task ->
                         todoViewModel.delete(task)
-                    }
+                    },
+                    onTaskSelect = { task ->
+                        todoViewModel.toggleTaskSelection(task.taskID)
+                    },
+                    selectedTaskIds = selectedTaskIds
                 )
             }
 
@@ -93,22 +109,24 @@ fun TododScreen() {
             if (showNewTaskDialog) {
                 Dialog(
                     onDismissRequest = {
-                        // Hide the dialog when clicking outside or dismissing it
                         showNewTaskDialog = false
                     },
-                    properties = DialogProperties(
-                        dismissOnClickOutside = true
-                    )
+                    properties = DialogProperties(dismissOnClickOutside = true)
                 ) {
-
                     Card(
-                        shape = MaterialTheme.shapes.medium,  // Rounded edges
+                        shape = MaterialTheme.shapes.medium,
                         elevation = CardDefaults.cardElevation(8.dp),
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        NewTaskForm(onSaveClick = { name, description ->
-                            // Handle task creation logic
-                            todoViewModel.insert(Task(name = name, description = description, completed = false))
+                        NewTaskForm(onSaveClick = { name, description, sessions ->
+                            todoViewModel.insert(
+                                Task(
+                                    name = name,
+                                    description = description,
+                                    sessions = sessions,
+                                    completed = false
+                                )
+                            )
                             showNewTaskDialog = false
                         })
                     }
@@ -119,20 +137,28 @@ fun TododScreen() {
 }
 
 @Composable
-fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task) -> Unit, modifier: Modifier = Modifier) {
+fun TaskList(
+    tasks: List<Task>,
+    onTaskClick: (Task) -> Unit,
+    onTaskRemove: (Task) -> Unit,
+    onTaskSelect: (Task) -> Unit,
+    selectedTaskIds: Set<UUID>,
+    modifier: Modifier = Modifier
+) {
+
     LazyColumn(
         modifier = modifier.fillMaxSize() // Apply modifier to LazyColumn
     ) {
         items(tasks) { task ->
-            TaskCard(
-                task = task,
-                taskName = task.name,
-                description = task.description,
-                sessions = task.sessions,
-                completed = task.completed,
-                onTaskClick = { updatedTask -> onTaskClick(updatedTask) },
-                onTaskRemove = { onTaskRemove(task) }
-            )
+            key(task.taskID, task.sessions) {
+                TaskCard(
+                    task = task,
+                    isSelected = task.taskID in selectedTaskIds,
+                    onTaskClick = { updatedTask -> onTaskClick(updatedTask) },
+                    onTaskRemove = { onTaskRemove(task) },
+                    onTaskSelect = { onTaskSelect(task) }
+                )
+            }
         }
     }
 }
@@ -140,21 +166,27 @@ fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task
 @Composable
 fun TaskCard(
     task: Task,
-    taskName: String,
-    description: String,
-    sessions: Int,
-    completed: Boolean,
+    isSelected: Boolean,
     onTaskClick: (Task) -> Unit,
-    onTaskRemove: (Task) -> Unit
+    onTaskRemove: (Task) -> Unit,
+    onTaskSelect: (Task) -> Unit
 ) {
-    // Track task is clicked or not
-   // var isClicked by remember { mutableStateOf(false) }
 
-    if (completed) {
-        LaunchedEffect(key1 = task) {
-            kotlinx.coroutines.delay(1200) // Delay
-            onTaskRemove(task)
-        }
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
+    val cardColorLight = when {
+        task.sessions > 7 -> Cards.cardYellow
+        task.sessions in 5..7 -> Cards.cardLightPurple
+        task.sessions in 3..5 -> Cards.cardTeal
+        task.sessions in 1..2 -> Cards.cardLightBlue
+        else -> Cards.cardGreen
+    }
+    val cardColorDark = when {
+        task.sessions > 7 -> Cards.cardOrange
+        task.sessions in 5..7 -> Cards.cardDarkPurple
+        task.sessions in 3..5 -> Cards.cardDarkTeal
+        task.sessions in 1..2 -> Cards.cardBlue
+        else -> Cards.cardGreen
     }
 
     Card(
@@ -163,13 +195,12 @@ fun TaskCard(
             .height(90.dp)
             .padding(5.dp)
             .clickable {
-                onTaskClick(task.copy(isClicked = !task.isClicked))
+                if (task.completed) {
+                    onTaskRemove(task)
+                } else onTaskSelect(task)
             },
-        elevation = if (task.isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(
-            8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onSecondary
-        )
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(if (isDarkMode) cardColorDark else cardColorLight)
     ) {
         Row(
             modifier = Modifier
@@ -178,50 +209,49 @@ fun TaskCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Change the button color when clicked
             IconButton(
                 onClick = {
-                    onTaskClick(task.copy(isClicked = !task.isClicked))
+                    if (task.completed) {
+                        onTaskRemove(task)
+                    } else {
+                        onTaskSelect(task)
+                    }
                 },
-                modifier = Modifier.size(48.dp)  // Adjust button size
+                modifier = Modifier.size(48.dp)
             ) {
                 Image(
-                    painter = painterResource(id = if (completed) R.drawable.checked_24 else R.drawable.unchecked_24),
+                    painter = painterResource(id = if (isSelected || task.completed) R.drawable.checked_24 else R.drawable.unchecked_24),
                     contentDescription = "Complete",
-                    colorFilter = ColorFilter.tint(if (task.isClicked) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onPrimary)
+                    colorFilter = ColorFilter.tint(if (isSelected) Color.Green else Color.Black)
                 )
             }
-                // Change text color when clicked
-                Text(
-                    text = taskName,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
-                    color = if (task.isClicked) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onPrimary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = description,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
-                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = "Dodo's left: ${task.sessions}",
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
+            Text(
+                text = task.name,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
+                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = task.description,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = if (task.completed) "Completed:)" else "Dodo's left: ${task.sessions}",
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
+                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
         }
     }
+}
 
 
 @Composable
-fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
+fun NewTaskForm(onSaveClick: (String, String, Int) -> Unit) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var numberDurations by remember { mutableIntStateOf(1) }
@@ -290,14 +320,16 @@ fun NewTaskForm(onSaveClick: (String, String) -> Unit) {
 
             NumberPickerDialog(
                 initialNumber = numberDurations,
-                onNumberSelected = { priority -> numberDurations = priority })
+                onNumberSelected = { sessions -> numberDurations = sessions })
 
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { onSaveClick(name, description) },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+                onClick = { onSaveClick(name, description, numberDurations) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
             ) {
                 Text("Save")
             }
@@ -316,13 +348,14 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     val infiniteNumbers = List(1000) { numbers[it % numbers.size] }
     val middleIndex = infiniteNumbers.size / 2
     // LazyListState to handle the initial index
-    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = middleIndex + initialNumber - 1)
+    val scrollState =
+        rememberLazyListState(initialFirstVisibleItemIndex = middleIndex + initialNumber - 1)
 
     Button(
         onClick = { isDialogOpen = true },
         modifier = Modifier.padding(16.dp)
     ) {
-        Text("Priority: $selectedNumber")
+        Text("Do in Dodo's: $selectedNumber")
     }
 
     if (isDialogOpen) {
@@ -401,71 +434,4 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
             }
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun TodoScreenPreview() {
-
-    val tasks = listOf(
-        Task(name = "Mock Task 1", description = "This is a mock task", completed = false),
-        Task(name = "Mock Task 2", description = "Another mock task", completed = true)
-    )
-
-
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = { /* No action for preview */ }) {
-                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Task")
-            }
-        }
-    ) { paddingValues ->
-        TaskList(
-            tasks = tasks,
-            onTaskClick = { /* No action for preview */ },
-            onTaskRemove = { /* No action for preview */ },
-            modifier = Modifier.padding(paddingValues)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TaskCardPreview() {
-    TaskCard(
-        task = Task(name = "Mock Task", description = "This is a preview of a task card", completed = false),
-        taskName = "Mock Task",
-        description = "This is a preview of a task card",
-        sessions = 1,
-        completed = false,
-        onTaskClick = { /* No action for preview */ },
-        onTaskRemove = { /* No action for preview */ }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun NewTaskFormPreview() {
-    NewTaskForm(onSaveClick = { name, description ->
-        // No real action needed in the preview
-    })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TaskListPreview() {
-
-    val tasks = listOf(
-        Task(name = "Mock Task 1", description = "This is the first task", completed = false),
-        Task(name = "Mock Task 2", description = "This is the second task", completed = true),
-        Task(name = "Mock Task 3", description = "This is the third task", completed = false)
-    )
-
-    TaskList(
-        tasks = tasks,
-        onTaskClick = { /* No action for preview */ },
-        onTaskRemove = { /* No action for preview */ }
-    )
 }

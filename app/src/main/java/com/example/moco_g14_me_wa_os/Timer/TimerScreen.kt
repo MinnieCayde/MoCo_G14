@@ -7,9 +7,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,12 +36,10 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.example.moco_g14_me_wa_os.Timer.State
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
+fun TimerScreen() {
 
-
-
+    val viewModel: PomodoroTimerViewModel = hiltViewModel()
     val remainingTime by viewModel.remainingTime.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
     val totalTime by viewModel.totalTime.collectAsState()
@@ -90,7 +88,6 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.eggblue_animation))
     val lottieAnimatable = rememberLottieAnimatable()
 
-
     LaunchedEffect(composition) {
         lottieAnimatable.animate(composition, iterations = LottieConstants.IterateForever)
     }
@@ -108,8 +105,6 @@ fun TimerScreen(viewModel: PomodoroTimerViewModel = hiltViewModel()) {
                 .fillMaxSize()
                 .background(backgroundColor)
         )
-
-
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

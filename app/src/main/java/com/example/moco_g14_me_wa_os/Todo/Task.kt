@@ -11,4 +11,5 @@ data class Task (
     var completed: Boolean = false,
     var sessions: Int = 1,
     var isClicked: Boolean = false,
+    var isSelected: Boolean = false,
     @PrimaryKey val taskID: UUID = UUID.randomUUID())
