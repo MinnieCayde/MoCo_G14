@@ -293,16 +293,19 @@ fun NewTaskForm(onSaveClick: (String, String, Int) -> Unit) {
                 fontWeight = FontWeight.SemiBold
             )
 
-        NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { sessions -> numberDurations = sessions })
+            NumberPickerDialog(
+                initialNumber = numberDurations,
+                onNumberSelected = { sessions -> numberDurations = sessions })
 
 
             Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { onSaveClick(name, description, numberDurations) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
-        ) {
-            Text("Save")
+            Button(
+                onClick = { onSaveClick(name, description, numberDurations) },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+            ) {
+                Text("Save")
+            }
         }
     }
 }
