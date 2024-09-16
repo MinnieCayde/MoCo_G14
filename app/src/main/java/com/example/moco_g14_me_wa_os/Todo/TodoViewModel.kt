@@ -6,25 +6,16 @@ import androidx.lifecycle.ViewModel
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(private val repository: TodoRepository) : ViewModel() {
-    /*val allTasks: StateFlow<List<Task>> = repository.allTasks
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )*/
 
     private val _allTasks = MutableStateFlow<List<Task>>(emptyList())
     val allTasks: StateFlow<List<Task>> = _allTasks.asStateFlow()
-
     private val _selectedTaskIds = MutableStateFlow<Set<UUID>>(emptySet())
     val selectedTaskIds: StateFlow<Set<UUID>> = _selectedTaskIds.asStateFlow()
 
@@ -60,8 +51,7 @@ class TodoViewModel @Inject constructor(private val repository: TodoRepository) 
             if (task.taskID in _selectedTaskIds.value && task.sessions > 0) {
                 val newSessions = task.sessions - 1
                 task.copy(
-                    sessions = newSessions,
-                    completed = newSessions == 0
+                    sessions = newSessions, completed = newSessions == 0
                 )
             } else {
                 task
@@ -92,6 +82,4 @@ class TodoViewModel @Inject constructor(private val repository: TodoRepository) 
     fun onTaskClick(task: Task) = viewModelScope.launch {
         update(task.copy(isClicked = !task.isClicked))
     }
-
-
 }

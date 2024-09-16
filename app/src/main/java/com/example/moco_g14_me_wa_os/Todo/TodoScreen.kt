@@ -15,52 +15,45 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import com.example.moco_g14_me_wa_os.R
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardColors
-import androidx.compose.runtime.key
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.colorResource
+import com.example.moco_g14_me_wa_os.R
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import java.util.UUID
-
-import androidx.compose.ui.modifier.modifierLocalProvider
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
-
 
 @Composable
 fun TododScreen() {
@@ -83,14 +76,17 @@ fun TododScreen() {
             FloatingActionButton(onClick = {
                 showNewTaskDialog = true
             }) {
-                Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Todo")
+                Icon(
+                    painter = painterResource(id = R.drawable.add_24),
+                    contentDescription = "New Todo"
+                )
             }
         },
         content = { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
                 TaskList(
                     tasks = tasks,
-                    onTaskClick = {task ->
+                    onTaskClick = { task ->
                         if (task.completed) {
                             todoViewModel.delete(task)
                         }
@@ -119,7 +115,14 @@ fun TododScreen() {
                         modifier = Modifier.padding(16.dp)
                     ) {
                         NewTaskForm(onSaveClick = { name, description, sessions ->
-                            todoViewModel.insert(Task(name = name, description = description, sessions = sessions, completed = false))
+                            todoViewModel.insert(
+                                Task(
+                                    name = name,
+                                    description = description,
+                                    sessions = sessions,
+                                    completed = false
+                                )
+                            )
                             showNewTaskDialog = false
                         })
                     }
@@ -130,12 +133,14 @@ fun TododScreen() {
 }
 
 @Composable
-fun TaskList(tasks: List<Task>,
-             onTaskClick: (Task) -> Unit,
-             onTaskRemove: (Task) -> Unit,
-             onTaskSelect: (Task) -> Unit,
-             selectedTaskIds: Set<UUID>,
-             modifier: Modifier = Modifier) {
+fun TaskList(
+    tasks: List<Task>,
+    onTaskClick: (Task) -> Unit,
+    onTaskRemove: (Task) -> Unit,
+    onTaskSelect: (Task) -> Unit,
+    selectedTaskIds: Set<UUID>,
+    modifier: Modifier = Modifier
+) {
 
     LazyColumn(
         modifier = modifier.fillMaxSize() // Apply modifier to LazyColumn
@@ -175,7 +180,11 @@ fun TaskCard(
             .fillMaxWidth()
             .height(90.dp)
             .padding(5.dp)
-            .clickable { if (task.completed){ onTaskRemove(task) } else onTaskSelect(task) },
+            .clickable {
+                if (task.completed) {
+                    onTaskRemove(task)
+                } else onTaskSelect(task)
+            },
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
@@ -187,11 +196,13 @@ fun TaskCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { if (task.completed) {
-                    onTaskRemove(task)
-                } else {
-                    onTaskSelect(task)
-                } },
+                onClick = {
+                    if (task.completed) {
+                        onTaskRemove(task)
+                    } else {
+                        onTaskSelect(task)
+                    }
+                },
                 modifier = Modifier.size(48.dp)
             ) {
                 Image(
@@ -215,7 +226,7 @@ fun TaskCard(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = if (task.completed) "Completed:)" else  "Dodo's left: ${task.sessions}",
+                text = if (task.completed) "Completed:)" else "Dodo's left: ${task.sessions}",
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
                 color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
@@ -302,7 +313,9 @@ fun NewTaskForm(onSaveClick: (String, String, Int) -> Unit) {
 
             Button(
                 onClick = { onSaveClick(name, description, numberDurations) },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
             ) {
                 Text("Save")
             }
@@ -321,7 +334,8 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
     val infiniteNumbers = List(1000) { numbers[it % numbers.size] }
     val middleIndex = infiniteNumbers.size / 2
     // LazyListState to handle the initial index
-    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = middleIndex + initialNumber - 1)
+    val scrollState =
+        rememberLazyListState(initialFirstVisibleItemIndex = middleIndex + initialNumber - 1)
 
     Button(
         onClick = { isDialogOpen = true },

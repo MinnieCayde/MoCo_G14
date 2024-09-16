@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()){
+fun SettingsScreen(){
+
+    val viewModel: SettingsViewModel = hiltViewModel()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
     val selectedWorkBreakOption by viewModel.selectedWorkBreak.collectAsState()

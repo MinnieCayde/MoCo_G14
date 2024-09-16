@@ -1,4 +1,5 @@
 package com.example.moco_g14_me_wa_os.Timer
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import android.app.Application
@@ -13,9 +14,9 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.viewModelScope
 import com.example.moco_g14_me_wa_os.Settings.SettingsRepository
 import com.example.moco_g14_me_wa_os.Todo.Task
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
 @HiltViewModel
 open class PomodoroTimerViewModel @Inject constructor(application: Application, private val settingsRepository: SettingsRepository) : AndroidViewModel(application) {
 
