@@ -56,7 +56,7 @@ import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
 import java.util.UUID
 
 @Composable
-fun TododScreen() {
+fun TodoScreen() {
 
     val todoViewModel: TodoViewModel = hiltViewModel()
     val timerViewModel: PomodoroTimerViewModel = hiltViewModel()

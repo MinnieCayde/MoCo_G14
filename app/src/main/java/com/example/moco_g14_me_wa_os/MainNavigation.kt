@@ -24,12 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.moco_g14_me_wa_os.Settings.SettingsScreen
-import com.example.moco_g14_me_wa_os.Settings.SettingsViewModel
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerService
-import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
-import com.example.moco_g14_me_wa_os.Todo.TododScreen
+import com.example.moco_g14_me_wa_os.Todo.TodoScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -89,7 +86,7 @@ fun MainNavigation() {
 
 @Composable
 fun LeftScreen() {
-    TododScreen()
+    TodoScreen()
 }
 
 @Composable

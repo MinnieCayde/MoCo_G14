@@ -20,12 +20,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val viewModel: SettingsViewModel = hiltViewModel()
-            val isDarkMode by viewModel.isDarkMode.collectAsState()
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
 
             // Use your main theme
             Moco_G14_Me_Wa_OsTheme(darkTheme = isDarkMode) {
-                    MainNavigation()
+                MainNavigation()
             }
         }
     }
