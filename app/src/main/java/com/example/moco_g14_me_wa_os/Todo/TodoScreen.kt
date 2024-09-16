@@ -49,22 +49,25 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardColors
+import androidx.compose.runtime.key
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import com.example.moco_g14_me_wa_os.Timer.PomodoroTimerViewModel
+import java.util.UUID
+
 
 
 @Composable
 fun TododScreen() {
-
     val todoViewModel: TodoViewModel = hiltViewModel()
     val timerViewModel: PomodoroTimerViewModel = hiltViewModel()
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         todoViewModel.observerTimerViewModel(timerViewModel)
     }
 
     val tasks by todoViewModel.allTasks.collectAsState()
+    val selectedTaskIds by todoViewModel.selectedTaskIds.collectAsState()
 
     // state to control visibility of the new task form
     var showNewTaskDialog by remember { mutableStateOf(false) }
@@ -72,46 +75,44 @@ fun TododScreen() {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                // Show the NewTaskForm dialog
                 showNewTaskDialog = true
             }) {
                 Icon(painter = painterResource(id = R.drawable.add_24), contentDescription = "New Todo")
             }
         },
         content = { paddingValues ->
-            // Apply padding to the content
             Column(modifier = Modifier.padding(paddingValues)) {
                 TaskList(
                     tasks = tasks,
-                    onTaskClick = { task ->
-                        todoViewModel.update(task.copy(completed = !task.completed))
+                    onTaskClick = {task ->
+                        if (task.completed) {
+                            todoViewModel.delete(task)
+                        }
                     },
                     onTaskRemove = { task ->
                         todoViewModel.delete(task)
-                    }
+                    },
+                    onTaskSelect = { task ->
+                        todoViewModel.toggleTaskSelection(task.taskID)
+                    },
+                    selectedTaskIds = selectedTaskIds
                 )
             }
 
-            // Show when the state is true
             if (showNewTaskDialog) {
                 Dialog(
                     onDismissRequest = {
-                        // Hide the dialog when clicking outside or dismissing it
                         showNewTaskDialog = false
                     },
-                    properties = DialogProperties(
-                        dismissOnClickOutside = true
-                    )
+                    properties = DialogProperties(dismissOnClickOutside = true)
                 ) {
-
                     Card(
-                        shape = MaterialTheme.shapes.medium,  // Rounded edges
+                        shape = MaterialTheme.shapes.medium,
                         elevation = CardDefaults.cardElevation(8.dp),
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        NewTaskForm(onSaveClick = { name, description, numberDurations ->
-                            // Handle task creation logic
-                            todoViewModel.insert(Task(name = name, description = description, sessions = numberDurations, completed = false))
+                        NewTaskForm(onSaveClick = { name, description, sessions ->
+                            todoViewModel.insert(Task(name = name, description = description, sessions = sessions, completed = false))
                             showNewTaskDialog = false
                         })
                     }
@@ -122,20 +123,26 @@ fun TododScreen() {
 }
 
 @Composable
-fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task) -> Unit, modifier: Modifier = Modifier) {
+fun TaskList(tasks: List<Task>,
+             onTaskClick: (Task) -> Unit,
+             onTaskRemove: (Task) -> Unit,
+             onTaskSelect: (Task) -> Unit,
+             selectedTaskIds: Set<UUID>,
+             modifier: Modifier = Modifier) {
+
     LazyColumn(
         modifier = modifier.fillMaxSize() // Apply modifier to LazyColumn
     ) {
         items(tasks) { task ->
-            TaskCard(
-                task = task,
-                taskName = task.name,
-                description = task.description,
-                sessions = task.sessions,
-                completed = task.completed,
-                onTaskClick = { updatedTask -> onTaskClick(updatedTask) },
-                onTaskRemove = { onTaskRemove(task) }
-            )
+            key(task.taskID, task.sessions) {
+                TaskCard(
+                    task = task,
+                    isSelected = task.taskID in selectedTaskIds,
+                    onTaskClick = { updatedTask -> onTaskClick(updatedTask) },
+                    onTaskRemove = { onTaskRemove(task) },
+                    onTaskSelect = { onTaskSelect(task) }
+                )
+            }
         }
     }
 }
@@ -143,25 +150,17 @@ fun TaskList(tasks: List<Task>, onTaskClick: (Task) -> Unit, onTaskRemove: (Task
 @Composable
 fun TaskCard(
     task: Task,
-    taskName: String,
-    description: String,
-    sessions: Int,
-    completed: Boolean,
+    isSelected: Boolean,
     onTaskClick: (Task) -> Unit,
-    onTaskRemove: (Task) -> Unit
+    onTaskRemove: (Task) -> Unit,
+    onTaskSelect: (Task) -> Unit
 ) {
-   val cardColor = when{
-       sessions > 5 -> colorResource(id = R.color.purple_200)
-       sessions in 3..5 -> colorResource(id = R.color.purple_500)
-       sessions in 1..2 -> colorResource(id = R.color.purple_700)
-       else -> colorResource(id = R.color.green)
-   }
-
-    if (completed) {
-        LaunchedEffect(key1 = task) {
-            kotlinx.coroutines.delay(1200) // Delay
-            onTaskRemove(task)
-        }
+    val cardColor = when {
+        task.sessions > 7 -> colorResource(id = R.color.purple_200)
+        task.sessions in 5..7 -> colorResource(id = R.color.primary)
+        task.sessions in 3..5 -> colorResource(id = R.color.purple_500)
+        task.sessions in 1..2 -> colorResource(id = R.color.purple_700)
+        else -> colorResource(id = R.color.green)
     }
 
     Card(
@@ -169,14 +168,9 @@ fun TaskCard(
             .fillMaxWidth()
             .height(90.dp)
             .padding(5.dp)
-            .clickable {
-                onTaskClick(task.copy(isClicked = !task.isClicked))
-            },
-        elevation = if (task.isClicked) CardDefaults.cardElevation(0.dp) else CardDefaults.cardElevation(
-            8.dp),
-        colors = CardDefaults.cardColors(
-            contentColor = cardColor
-        )
+            .clickable { if (task.completed){ onTaskRemove(task) } else onTaskSelect(task) },
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Row(
             modifier = Modifier
@@ -185,46 +179,43 @@ fun TaskCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Change the button color when clicked
             IconButton(
-                onClick = {
-                    onTaskClick(task.copy(isClicked = !task.isClicked))
-                },
+                onClick = { if (task.completed) {
+                    onTaskRemove(task)
+                } else {
+                    onTaskSelect(task)
+                } },
                 modifier = Modifier.size(48.dp)
             ) {
                 Image(
-                    painter = painterResource(id = if (completed) R.drawable.checked_24 else R.drawable.unchecked_24),
+                    painter = painterResource(id = if (isSelected || task.completed) R.drawable.checked_24 else R.drawable.unchecked_24),
                     contentDescription = "Complete",
-                    colorFilter = ColorFilter.tint(if (task.isClicked) Color.Cyan else Color.Black)
+                    colorFilter = ColorFilter.tint(if (isSelected) Color.Green else Color.Black)
                 )
             }
-                // Change text color when clicked
-                Text(
-                    text = taskName,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
-                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = description,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
-                    color = if (task.isClicked) Color.Cyan else MaterialTheme.colorScheme.onBackground
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = "Dodo's left: $sessions",
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+            Text(
+                text = task.name,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
+                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = task.description,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = if (task.completed) "Completed:)" else  "Dodo's left: ${task.sessions}",
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End),
+                color = if (isSelected) Color.Cyan else MaterialTheme.colorScheme.onBackground
+            )
         }
     }
+}
 
 
 @Composable
@@ -262,7 +253,7 @@ fun NewTaskForm(onSaveClick: (String, String, Int) -> Unit) {
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-       NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { sessions -> numberDurations = sessions })
+        NumberPickerDialog(initialNumber = numberDurations, onNumberSelected = { sessions -> numberDurations = sessions })
 
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -373,4 +364,3 @@ fun NumberPickerDialog(initialNumber: Int, onNumberSelected: (Int) -> Unit) {
         }
     }
 }
-

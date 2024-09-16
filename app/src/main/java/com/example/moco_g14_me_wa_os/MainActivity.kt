@@ -35,14 +35,7 @@ class MainActivity : ComponentActivity() {
 
             // Use your main theme
             Moco_G14_Me_Wa_OsTheme(darkTheme = isDarkMode) {
-
-
-
                     MainNavigation()
-
-                    // Display the AnimatedPreloader in the center
-
-
             }
         }
     }

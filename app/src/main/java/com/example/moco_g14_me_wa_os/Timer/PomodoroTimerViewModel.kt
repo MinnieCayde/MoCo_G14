@@ -110,8 +110,8 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
         _isRunning.value = false
         if (state.value == State.Work) {
             _completedPomodoros.value++
-            _onSessionCompleted.value = Task(name = "", description = "", sessions = 0, completed = false)
-            if (isLongBreakRequired()) _state.value = State.Longbreak
+            _onSessionCompleted.value = true
+             if (isLongBreakRequired()) _state.value = State.Longbreak
             else _state.value = State.Shortbreak
         } else {
             _state.value = State.Work
@@ -124,6 +124,9 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
         }
         _totalTime.value = nextTimerDuration
         _remainingTime.value = nextTimerDuration
+    }
+    fun resetSessionCompleted() {
+        _onSessionCompleted.value = false
     }
 
 
@@ -146,10 +149,10 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
     }
     fun setWorkDuration(minutes: Int) {
         viewModelScope.launch {
-                dataStore.saveTimerDuration(minutes)
-                _totalTime.value = minutes *60L * 1000L
-                _remainingTime.value = _totalTime.value
-                collectTime()
+            dataStore.saveTimerDuration(minutes)
+            _totalTime.value = minutes *60L * 1000L
+            _remainingTime.value = _totalTime.value
+            collectTime()
         }
     }
 
@@ -157,8 +160,8 @@ open class PomodoroTimerViewModel @Inject constructor(application: Application, 
         _remainingTime.value = newTime
     }
 
-    internal val _onSessionCompleted = MutableStateFlow<Task?>(null)
-    val onSessionCompleted = _onSessionCompleted.asStateFlow()
+    internal val _onSessionCompleted = MutableStateFlow(false)
+    val onSessionCompleted: StateFlow<Boolean> = _onSessionCompleted.asStateFlow()
 
     private val _currentTask = MutableStateFlow<Task?>(null)
     val currentTask: StateFlow<Task?> = _currentTask.asStateFlow()
